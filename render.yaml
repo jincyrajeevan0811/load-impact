@@ -1,0 +1,30 @@
+# Render Blueprint for LoadImpact (https://render.com/docs/blueprint-spec)
+# Render → New → Blueprint → pick this repository → Apply.
+databases:
+  - name: loadimpact-db
+    plan: free
+    databaseName: loadimpact
+    user: loadimpact
+
+services:
+  - type: web
+    name: loadimpact
+    runtime: python
+    plan: free
+    buildCommand: bash build.sh
+    startCommand: gunicorn loadimpact.wsgi:application
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.7
+      - key: DATABASE_URL
+        fromDatabase:
+          name: loadimpact-db
+          property: connectionString
+      - key: DJANGO_SECRET_KEY
+        generateValue: true
+      - key: DJANGO_DEBUG
+        value: "False"
+      - key: DJANGO_ADMIN_PASSWORD
+        sync: false
+      - key: WEB_CONCURRENCY
+        value: "2"

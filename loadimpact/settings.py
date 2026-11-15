@@ -13,13 +13,20 @@ SECRET_KEY = os.environ.get(
     "DJANGO_SECRET_KEY",
     "django-insecure-loadimpact-change-this-key-before-going-live-9f3k2m",
 )
-DEBUG = os.environ.get("DJANGO_DEBUG", "True") == "True"
+# On Render, DEBUG is off unless DJANGO_DEBUG=True is set explicitly.
+ON_RENDER = "RENDER" in os.environ
+DEBUG = os.environ.get("DJANGO_DEBUG", "False" if ON_RENDER else "True") == "True"
+
 ALLOWED_HOSTS = os.environ.get(
-    "DJANGO_ALLOWED_HOSTS", "127.0.0.1,localhost,.pythonanywhere.com"
+    "DJANGO_ALLOWED_HOSTS", "127.0.0.1,localhost,.onrender.com,.pythonanywhere.com"
 ).split(",")
+RENDER_EXTERNAL_HOSTNAME = os.environ.get("RENDER_EXTERNAL_HOSTNAME")
+if RENDER_EXTERNAL_HOSTNAME:
+    ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
+
 CSRF_TRUSTED_ORIGINS = [
     origin for origin in os.environ.get(
-        "DJANGO_CSRF_TRUSTED_ORIGINS", "https://*.pythonanywhere.com"
+        "DJANGO_CSRF_TRUSTED_ORIGINS", "https://*.onrender.com,https://*.pythonanywhere.com"
     ).split(",") if origin
 ]
 
@@ -48,6 +55,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",  # serves static files in production
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -77,12 +85,19 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "loadimpact.wsgi.application"
 
+# SQLite locally; PostgreSQL when DATABASE_URL is set (e.g. Render's database).
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
         "NAME": BASE_DIR / "db.sqlite3",
     }
 }
+if os.environ.get("DATABASE_URL"):
+    import dj_database_url
+
+    DATABASES["default"] = dj_database_url.parse(
+        os.environ["DATABASE_URL"], conn_max_age=600
+    )
 
 AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
@@ -99,6 +114,10 @@ USE_TZ = True
 STATIC_URL = "static/"
 STATICFILES_DIRS = [BASE_DIR / "static"]
 STATIC_ROOT = BASE_DIR / "staticfiles"
+STORAGES = {
+    "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
+    "staticfiles": {"BACKEND": "whitenoise.storage.CompressedStaticFilesStorage"},
+}
 
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"

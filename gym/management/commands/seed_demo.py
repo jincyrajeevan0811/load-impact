@@ -1,3 +1,4 @@
+import os
 from datetime import time, timedelta
 
 from django.contrib.auth import get_user_model
@@ -22,7 +23,11 @@ class Command(BaseCommand):
     help = "Load demo data: plans, trainers, weekly classes, announcements, an admin and a demo member."
 
     def add_arguments(self, parser):
-        parser.add_argument("--admin-password", default="Admin@123", help="Password for the 'admin' user.")
+        parser.add_argument(
+            "--admin-password",
+            default=os.environ.get("DJANGO_ADMIN_PASSWORD", "Admin@123"),
+            help="Password for the 'admin' user (default: DJANGO_ADMIN_PASSWORD env var or Admin@123).",
+        )
         parser.add_argument("--member-password", default="Member@123", help="Password for the 'member' user.")
 
     def handle(self, *args, **opts):
