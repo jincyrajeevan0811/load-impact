@@ -1,0 +1,8 @@
+<section class="page-header" style="--img: url('{{ s.img|default:IMG.page_header }}')">
+  <div class="blob blob-1" style="opacity:.3"></div>
+  <div class="container text-center">
+    <div class="breadcrumb-li"><a href="{% url 'gym:home' %}"><i class="bi bi-house"></i> Home</a><span class="text-muted">/</span><span class="text-primary-li">{{ s.title }}</span></div>
+    <h1>{{ s.title }}</h1>
+    {% if s.subtitle %}<p class="lead mx-auto mb-0" style="max-width:640px">{{ s.subtitle }}</p>{% endif %}
+  </div>
+</section>

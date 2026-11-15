@@ -1,0 +1,6 @@
+{% comment %}Logo: uploaded image, or icon + two-part text. Used in header, footer, dashboard.{% endcomment %}
+{% if SITE and SITE.logo %}
+  <img src="{{ SITE.logo.url }}" alt="{{ GYM.name }}" class="brand-logo">
+{% else %}
+  <span class="bolt"><i class="bi {{ SITE.brand_icon|default:'bi-lightning-charge-fill' }}"></i></span>{{ SITE.brand_text_1|default:"LOAD" }}<span class="accent">{% if SITE %}{{ SITE.brand_text_2 }}{% else %}IMPACT{% endif %}</span>
+{% endif %}

@@ -1,0 +1,11 @@
+{% if s.item_list %}
+<section class="section pt-0">
+  <div class="container">
+    <div class="row g-4">
+      {% for item in s.item_list %}
+      <div class="col-md-4" data-reveal="up" data-delay=".{{ forloop.counter0 }}"><div class="card-li p-4 h-100 d-flex gap-3"><span class="feature-icon flex-shrink-0"><i class="bi {{ item.icon|default:'bi-star' }}"></i></span><div><h5 class="text-white">{{ item.title }}</h5><p class="small text-muted mb-0">{{ item.text }}</p></div></div></div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}

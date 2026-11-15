@@ -1,0 +1,20 @@
+<div class="col-md-6 col-lg-4" data-reveal="up" data-delay=".{{ forloop.counter0|default:0 }}">
+  <div class="card-li pricing-card {% if plan.is_popular %}popular{% endif %}">
+    {% if plan.is_popular %}<div class="ribbon"><i class="bi bi-fire"></i> MOST POPULAR</div>{% endif %}
+    <div class="feature-icon mb-3"><i class="bi {% if plan.duration_days >= 365 %}bi-gem{% elif plan.duration_days >= 180 %}bi-trophy{% elif plan.duration_days >= 90 %}bi-lightning-charge{% else %}bi-activity{% endif %}"></i></div>
+    <div class="plan-name display-font">{{ plan.name }}</div>
+    <p class="text-muted small mb-3">{{ plan.description }}</p>
+    <div class="price"><sup>{{ GYM.currency }}</sup>{{ plan.price|floatformat:0 }} <small>/ {{ plan.duration_label }}</small></div>
+    <div class="divider"></div>
+    <ul class="list-unstyled feature-list mb-4 flex-grow-1">
+      {% for f in plan.feature_list %}
+        <li><i class="bi bi-check-circle-fill"></i>{{ f }}</li>
+      {% endfor %}
+    </ul>
+    {% if user.is_authenticated %}
+      <a href="{% url 'members:subscribe' plan.id %}" class="btn {% if plan.is_popular %}btn-li{% else %}btn-glass{% endif %} w-100 mt-auto">Choose {{ plan.name }} <i class="bi bi-arrow-right ms-1"></i></a>
+    {% else %}
+      <a href="{% url 'accounts:register' %}" class="btn {% if plan.is_popular %}btn-li{% else %}btn-glass{% endif %} w-100 mt-auto">Get Started <i class="bi bi-arrow-right ms-1"></i></a>
+    {% endif %}
+  </div>
+</div>

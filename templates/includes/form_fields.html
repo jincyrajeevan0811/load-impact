@@ -1,0 +1,26 @@
+{% comment %}Renders every field of `form` using Bootstrap markup. Optional: cols (e.g. "col-md-6").{% endcomment %}
+{% if form.non_field_errors %}
+  <div class="alert alert-danger">{% for err in form.non_field_errors %}<div>{{ err }}</div>{% endfor %}</div>
+{% endif %}
+{% for hidden in form.hidden_fields %}{{ hidden }}{% endfor %}
+<div class="row g-3">
+{% for field in form.visible_fields %}
+  {% if field.widget_type == 'checkbox' %}
+    <div class="{{ cols|default:'col-12' }}">
+      <div class="form-check mt-md-4">
+        {{ field }}
+        <label class="form-check-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+        {% if field.help_text %}<div class="form-text">{{ field.help_text|safe }}</div>{% endif %}
+        {% for error in field.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+      </div>
+    </div>
+  {% else %}
+    <div class="{% if field.widget_type == 'textarea' %}col-12{% else %}{{ cols|default:'col-12' }}{% endif %}">
+      <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}{% if field.field.required %} <span class="text-danger">*</span>{% endif %}</label>
+      {{ field }}
+      {% if field.help_text %}<div class="form-text">{{ field.help_text|safe }}</div>{% endif %}
+      {% for error in field.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+    </div>
+  {% endif %}
+{% endfor %}
+</div>

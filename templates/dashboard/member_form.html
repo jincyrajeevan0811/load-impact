@@ -1,0 +1,20 @@
+{% extends 'dashboard/base.html' %}
+{% block title %}{{ page_title }}{% endblock %}
+{% block page_title %}{{ page_title }}{% endblock %}
+{% block content %}
+<form method="post" enctype="multipart/form-data" novalidate>
+  {% csrf_token %}
+  <div class="panel mb-3">
+    <div class="panel-title">Account details</div>
+    {% include 'includes/form_fields.html' with form=user_form cols='col-md-4' %}
+  </div>
+  <div class="panel mb-3">
+    <div class="panel-title">Personal &amp; fitness details</div>
+    {% include 'includes/form_fields.html' with form=profile_form cols='col-md-4' %}
+  </div>
+  <div class="d-flex gap-2">
+    <button type="submit" class="btn btn-dash"><i class="bi bi-check2"></i> Save Member</button>
+    <a href="{% if member %}{% url 'dashboard:member_detail' member.pk %}{% else %}{% url 'dashboard:member_list' %}{% endif %}" class="btn btn-outline-secondary">Cancel</a>
+  </div>
+</form>
+{% endblock %}

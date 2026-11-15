@@ -1,0 +1,19 @@
+{% if s.item_list %}
+<section class="section pt-0">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-lg-8" data-reveal="up">
+        <div class="text-center mb-4">{% include 'appearance/_heading.html' with center=True %}</div>
+        <div class="accordion" id="faq{{ s.pk }}">
+          {% for item in s.item_list %}
+          <div class="accordion-item glass mb-3 border-0 overflow-hidden">
+            <h3 class="accordion-header"><button class="accordion-button collapsed fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#faq{{ s.pk }}-{{ forloop.counter }}">{{ item.title }}</button></h3>
+            <div id="faq{{ s.pk }}-{{ forloop.counter }}" class="accordion-collapse collapse" data-bs-parent="#faq{{ s.pk }}"><div class="accordion-body text-muted">{{ item.text|linebreaksbr }}</div></div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endif %}

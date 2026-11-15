@@ -1,0 +1,10 @@
+<div class="panel mb-3 py-2 px-2">
+  <ul class="nav nav-pills flex-nowrap overflow-auto gap-1">
+    <li class="nav-item"><a class="nav-link text-nowrap {% if tab == 'home' %}active{% endif %}" href="{% url 'dashboard:appearance_home' %}"><i class="bi bi-grid me-1"></i> Overview</a></li>
+    <li class="nav-item"><a class="nav-link text-nowrap {% if tab == 'branding' %}active{% endif %}" href="{% url 'dashboard:appearance_branding' %}"><i class="bi bi-award me-1"></i> Branding &amp; Logo</a></li>
+    <li class="nav-item"><a class="nav-link text-nowrap {% if tab == 'colors' %}active{% endif %}" href="{% url 'dashboard:appearance_colors' %}"><i class="bi bi-palette me-1"></i> Colours &amp; Fonts</a></li>
+    <li class="nav-item"><a class="nav-link text-nowrap {% if tab == 'pages' %}active{% endif %}" href="{% url 'dashboard:appearance_pages' %}"><i class="bi bi-layout-text-window me-1"></i> Pages &amp; Sections</a></li>
+    <li class="nav-item"><a class="nav-link text-nowrap {% if tab == 'nav' %}active{% endif %}" href="{% url 'dashboard:appearance_nav' %}"><i class="bi bi-menu-button-wide me-1"></i> Navigation</a></li>
+    <li class="nav-item"><a class="nav-link text-nowrap {% if tab == 'contact' %}active{% endif %}" href="{% url 'dashboard:appearance_contact' %}"><i class="bi bi-telephone me-1"></i> Contact &amp; Footer</a></li>
+  </ul>
+</div>

@@ -1,0 +1,37 @@
+{% extends 'dashboard/base.html' %}
+{% block title %}Trainers{% endblock %}
+{% block page_title %}Trainers{% endblock %}
+{% block content %}
+<div class="panel">
+  <div class="d-flex justify-content-end mb-3">
+    <a href="{% url 'dashboard:trainer_add' %}" class="btn btn-dash btn-sm"><i class="bi bi-plus-lg"></i> Add Trainer</a>
+  </div>
+  <div class="table-responsive">
+    <table class="table table-dash table-hover">
+      <thead><tr><th>Trainer</th><th>Gender</th><th>Specialization</th><th>Experience</th><th>Contact</th><th>Classes</th><th>Status</th><th></th></tr></thead>
+      <tbody>
+      {% for t in trainers %}
+        <tr>
+          <td class="d-flex align-items-center gap-2">
+            {% if t.photo %}<img src="{{ t.photo.url }}" class="avatar-sm" alt="">{% else %}<span class="avatar-sm">{{ t.name|slice:":1" }}</span>{% endif %}
+            <span class="fw-semibold">{{ t.name }}</span>
+          </td>
+          <td>{{ t.get_gender_display }}</td>
+          <td>{{ t.specialization }}</td>
+          <td>{{ t.experience_years }} yrs</td>
+          <td class="small">{{ t.phone|default:"" }}<br>{{ t.email|default:"" }}</td>
+          <td>{{ t.class_count }}</td>
+          <td>{% if t.is_active %}<span class="badge text-bg-success">Active</span>{% else %}<span class="badge text-bg-secondary">Inactive</span>{% endif %}</td>
+          <td class="text-end text-nowrap">
+            <a href="{% url 'dashboard:trainer_edit' t.pk %}" class="btn btn-sm btn-light"><i class="bi bi-pencil"></i></a>
+            <a href="{% url 'dashboard:trainer_delete' t.pk %}" class="btn btn-sm btn-light text-danger"><i class="bi bi-trash"></i></a>
+          </td>
+        </tr>
+      {% empty %}
+        <tr><td colspan="8" class="text-center text-muted py-4">No trainers yet.</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

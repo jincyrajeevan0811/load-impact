@@ -1,0 +1,24 @@
+<section class="section section-alt overflow-hidden">
+  <div class="container">
+    <div class="row align-items-center g-5">
+      <div class="col-lg-6" data-reveal="left">
+        <div class="about-collage">
+          <div class="ph ph-1" style="--img1: url('{{ s.img }}')"></div>
+          <div class="ph ph-2" style="--img2: url('{{ s.img2 }}')"></div>
+          {% if s.badge_display %}<div class="exp-badge"><div class="num count-up">{{ s.badge_display }}</div><div class="small fw-semibold" style="max-width:130px">{{ s.badge_text }}</div></div>{% endif %}
+        </div>
+      </div>
+      <div class="col-lg-6" data-reveal="right">
+        {% include 'appearance/_heading.html' with lead=True %}
+        {% if s.item_list %}
+        <ul class="list-unstyled check-list my-4">
+          {% for item in s.item_list %}
+            <li><i class="bi bi-check-lg"></i><div><strong class="text-white">{{ item.title }}</strong>{% if item.text %}<div class="small text-muted">{{ item.text }}</div>{% endif %}</div></li>
+          {% endfor %}
+        </ul>
+        {% endif %}
+        {% if s.button_text %}<a href="{{ s.button_url|default:'#' }}" class="btn btn-outline-li">{{ s.button_text }} <i class="bi bi-arrow-right ms-1"></i></a>{% endif %}
+      </div>
+    </div>
+  </div>
+</section>

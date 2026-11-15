@@ -1,0 +1,7 @@
+{% if s.item_list %}
+<div class="marquee" aria-hidden="true">
+  <div class="marquee-track">
+    {% for i in "12" %}{% for item in s.item_list %}<span>{{ item.title }} <i class="bi bi-asterisk"></i></span>{% endfor %}{% endfor %}
+  </div>
+</div>
+{% endif %}

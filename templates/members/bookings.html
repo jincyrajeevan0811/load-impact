@@ -1,0 +1,58 @@
+{% extends 'members/_base.html' %}
+{% block title %}My Bookings – {{ GYM.name }}{% endblock %}
+{% block member_content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h2 class="mb-0">My Bookings</h2>
+  <a href="{% url 'members:classes' %}" class="btn btn-li"><i class="bi bi-plus"></i> Book Class</a>
+</div>
+
+<div class="card-li no-hover p-4 mb-4">
+  <h5 class="mb-3">Upcoming</h5>
+  <div class="table-responsive">
+    <table class="table align-middle mb-0">
+      <thead><tr><th>Class</th><th>Date</th><th>Time</th><th>Trainer</th><th>Status</th><th></th></tr></thead>
+      <tbody>
+      {% for b in upcoming %}
+        <tr>
+          <td class="fw-semibold">{{ b.gym_class.name }}</td>
+          <td>{{ b.date|date:"D, d M Y" }}</td>
+          <td>{{ b.gym_class.start_time|time:"g:i A" }}</td>
+          <td>{{ b.gym_class.trainer.name|default:"—" }}</td>
+          <td>{% include 'includes/status_badge.html' with status=b.status label=b.get_status_display %}</td>
+          <td class="text-end">
+            {% if b.can_cancel %}
+              <form method="post" action="{% url 'members:cancel_booking' b.id %}" data-confirm="Cancel this booking?">{% csrf_token %}
+                <button class="btn btn-sm btn-outline-danger rounded-pill">Cancel</button>
+              </form>
+            {% endif %}
+          </td>
+        </tr>
+      {% empty %}
+        <tr><td colspan="6" class="text-muted">No upcoming bookings.</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="card-li no-hover p-4">
+  <h5 class="mb-3">History</h5>
+  <div class="table-responsive">
+    <table class="table align-middle mb-0">
+      <thead><tr><th>Class</th><th>Date</th><th>Time</th><th>Status</th></tr></thead>
+      <tbody>
+      {% for b in past %}
+        <tr>
+          <td>{{ b.gym_class.name }}</td>
+          <td>{{ b.date|date:"d M Y" }}</td>
+          <td>{{ b.gym_class.start_time|time:"g:i A" }}</td>
+          <td>{% include 'includes/status_badge.html' with status=b.status label=b.get_status_display %}</td>
+        </tr>
+      {% empty %}
+        <tr><td colspan="4" class="text-muted">No past bookings.</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

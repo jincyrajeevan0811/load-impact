@@ -1,0 +1,79 @@
+{% extends 'dashboard/base.html' %}
+{% load humanize %}
+{% block title %}Reports{% endblock %}
+{% block page_title %}Reports{% endblock %}
+{% block content %}
+<div class="panel mb-3">
+  <form class="row g-2 align-items-end" method="get">
+    <div class="col-md-3"><label class="form-label">From</label><input type="date" name="from" value="{{ date_from }}" class="form-control"></div>
+    <div class="col-md-3"><label class="form-label">To</label><input type="date" name="to" value="{{ date_to }}" class="form-control"></div>
+    <div class="col-md-2"><button class="btn btn-dark w-100">Apply</button></div>
+    <div class="col-md-4 text-md-end">
+      <a href="{% url 'dashboard:payment_list' %}?export=csv&status=paid&from={{ date_from }}&to={{ date_to }}" class="btn btn-outline-secondary btn-sm"><i class="bi bi-download"></i> Payments CSV</a>
+      <a href="{% url 'dashboard:member_list' %}?export=csv" class="btn btn-outline-secondary btn-sm"><i class="bi bi-download"></i> Members CSV</a>
+    </div>
+  </form>
+</div>
+
+<div class="row g-3 mb-3">
+  <div class="col-sm-6 col-xl"><div class="kpi"><div class="kpi-icon bg-warning-subtle text-warning"><i class="bi bi-currency-rupee"></i></div><div><div class="kpi-value count-up">{{ GYM.currency }}{{ revenue|floatformat:0|intcomma }}</div><div class="kpi-label">Revenue · {{ payments_count }} payments</div></div></div></div>
+  <div class="col-sm-6 col-xl"><div class="kpi"><div class="kpi-icon bg-primary-subtle text-primary"><i class="bi bi-person-plus"></i></div><div><div class="kpi-value count-up">{{ new_members }}</div><div class="kpi-label">New members</div></div></div></div>
+  <div class="col-sm-6 col-xl"><div class="kpi"><div class="kpi-icon bg-info-subtle text-info"><i class="bi bi-door-open"></i></div><div><div class="kpi-value count-up">{{ visits }}</div><div class="kpi-label">Gym visits</div></div></div></div>
+  <div class="col-sm-6 col-xl"><div class="kpi"><div class="kpi-icon bg-success-subtle text-success"><i class="bi bi-calendar-check"></i></div><div><div class="kpi-value count-up">{{ bookings }}</div><div class="kpi-label">Class bookings</div></div></div></div>
+</div>
+
+<div class="row g-3">
+  <div class="col-lg-6">
+    <div class="panel h-100">
+      <div class="panel-title">Revenue by plan</div>
+      <table class="table table-dash">
+        <thead><tr><th>Plan</th><th>Payments</th><th class="text-end">Revenue</th></tr></thead>
+        <tbody>
+        {% for r in by_plan %}
+          <tr><td>{{ r.membership__plan__name }}</td><td>{{ r.count }}</td><td class="text-end">{{ GYM.currency }}{{ r.total|floatformat:0|intcomma }}</td></tr>
+        {% empty %}<tr><td colspan="3" class="text-muted">No data for this period.</td></tr>{% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="col-lg-6">
+    <div class="panel h-100">
+      <div class="panel-title">Revenue by payment method</div>
+      <table class="table table-dash">
+        <thead><tr><th>Method</th><th>Payments</th><th class="text-end">Revenue</th></tr></thead>
+        <tbody>
+        {% for r in by_method %}
+          <tr><td>{{ r.label }}</td><td>{{ r.count }}</td><td class="text-end">{{ GYM.currency }}{{ r.total|floatformat:0|intcomma }}</td></tr>
+        {% empty %}<tr><td colspan="3" class="text-muted">No data for this period.</td></tr>{% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="col-lg-6">
+    <div class="panel h-100">
+      <div class="panel-title">Most booked classes</div>
+      <table class="table table-dash">
+        <thead><tr><th>Class</th><th class="text-end">Bookings</th></tr></thead>
+        <tbody>
+        {% for r in top_classes %}
+          <tr><td>{{ r.gym_class__name }}</td><td class="text-end">{{ r.c }}</td></tr>
+        {% empty %}<tr><td colspan="2" class="text-muted">No bookings in this period.</td></tr>{% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="col-lg-6">
+    <div class="panel h-100">
+      <div class="panel-title">Memberships by status (all time)</div>
+      <table class="table table-dash">
+        <thead><tr><th>Status</th><th class="text-end">Count</th></tr></thead>
+        <tbody>
+        {% for r in membership_status %}
+          <tr><td>{{ r.label }}</td><td class="text-end">{{ r.count }}</td></tr>
+        {% empty %}<tr><td colspan="2" class="text-muted">No memberships yet.</td></tr>{% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

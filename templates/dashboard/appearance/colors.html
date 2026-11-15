@@ -1,0 +1,133 @@
+{% extends 'dashboard/base.html' %}
+{% block title %}Colours & Fonts{% endblock %}
+{% block page_title %}Appearance · Colours &amp; Fonts{% endblock %}
+{% block content %}
+{% include 'dashboard/appearance/_tabs.html' %}
+<form method="post" id="colorsForm" novalidate>
+  {% csrf_token %}
+  {% if form.non_field_errors %}<div class="alert alert-danger">{{ form.non_field_errors }}</div>{% endif %}
+  <div class="row g-3">
+    <div class="col-xl-7">
+      <div class="panel mb-3">
+        <div class="panel-title">Quick themes <small class="text-muted fw-normal">Click to fill the colours, then Save</small></div>
+        <div class="d-flex flex-wrap gap-2">
+          {% for p in presets %}
+            <button type="button" class="btn btn-light d-flex align-items-center gap-2 preset-btn" data-primary="{{ p.primary }}" data-secondary="{{ p.secondary }}" data-accent="{{ p.accent }}" data-bg="{{ p.bg }}" data-surface="{{ p.surface }}">
+              <span class="d-inline-block rounded-circle" style="width:20px;height:20px;background:linear-gradient(135deg,{{ p.primary }},{{ p.secondary }})"></span>{{ p.name }}
+            </button>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="panel mb-3">
+        <div class="panel-title">Website colours</div>
+        <div class="row g-3">
+          {% for field in form %}{% if field.name in "primary_color secondary_color accent_color background_color surface_color text_color" %}
+            <div class="col-6 col-md-4">
+              <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+              {{ field }}
+              {% for e in field.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
+            </div>
+          {% endif %}{% endfor %}
+        </div>
+      </div>
+
+      <div class="panel mb-3">
+        <div class="panel-title">Fonts</div>
+        <div class="row g-3">
+          <div class="col-md-6"><label class="form-label" for="{{ form.heading_font.id_for_label }}">Heading font</label>{{ form.heading_font }}</div>
+          <div class="col-md-6"><label class="form-label" for="{{ form.body_font.id_for_label }}">Body font</label>{{ form.body_font }}</div>
+        </div>
+      </div>
+
+      <div class="panel mb-3">
+        <div class="panel-title">Admin dashboard colours</div>
+        <div class="row g-3">
+          <div class="col-6 col-md-3"><label class="form-label" for="{{ form.dash_primary_color.id_for_label }}">Primary</label>{{ form.dash_primary_color }}</div>
+          <div class="col-6 col-md-3"><label class="form-label" for="{{ form.dash_secondary_color.id_for_label }}">Secondary</label>{{ form.dash_secondary_color }}</div>
+          <div class="col-6 col-md-3"><label class="form-label" for="{{ form.dash_sidebar_color.id_for_label }}">Sidebar</label>{{ form.dash_sidebar_color }}</div>
+          <div class="col-6 col-md-3"><label class="form-label" for="{{ form.dash_default_theme.id_for_label }}">Default mode</label>{{ form.dash_default_theme }}</div>
+        </div>
+        <div class="form-text mt-2">The dashboard changes as you pick colours. Save to keep them. Each admin can still switch light/dark with the moon button.</div>
+      </div>
+
+      <div class="d-flex flex-wrap gap-2">
+        <button type="submit" class="btn btn-dash"><i class="bi bi-check2"></i> Save colours &amp; fonts</button>
+        <a href="{% url 'gym:home' %}" target="_blank" class="btn btn-light"><i class="bi bi-eye"></i> View website</a>
+        <button type="submit" name="action" value="reset" class="btn btn-outline-danger ms-auto" formnovalidate onclick="return confirm('Restore the original LoadImpact colours and fonts?')"><i class="bi bi-arrow-counterclockwise"></i> Reset to default</button>
+      </div>
+    </div>
+
+    <div class="col-xl-5">
+      <div class="panel position-sticky" style="top:90px">
+        <div class="panel-title">Live website preview</div>
+        <div id="sitePreview" class="rounded-4 overflow-hidden border" style="--p:{{ site.primary_color }};--s:{{ site.secondary_color }};--a:{{ site.accent_color }};--bg:{{ site.background_color }};--sf:{{ site.surface_color }};--tx:{{ site.text_color }};background:var(--bg);color:var(--tx)">
+          <div class="d-flex align-items-center justify-content-between px-3 py-2" style="border-bottom:1px solid rgba(255,255,255,.08)">
+            <span class="pv-head fs-5" style="color:#fff">{{ site.brand_text_1 }}<span style="color:var(--p)">{{ site.brand_text_2 }}</span></span>
+            <span class="badge rounded-pill" style="background:linear-gradient(135deg,var(--p),var(--s))">{{ site.nav_cta_text }}</span>
+          </div>
+          <div class="p-4">
+            <div class="small fw-semibold text-uppercase" style="color:var(--p);letter-spacing:2px">What we offer</div>
+            <div class="pv-head" style="font-size:2.4rem;line-height:1;color:#fff">Build your <span style="background:linear-gradient(135deg,var(--a),var(--p),var(--s));-webkit-background-clip:text;background-clip:text;color:transparent">strength</span></div>
+            <p class="pv-body small mt-2 mb-3" style="opacity:.75">Modern equipment, certified coaches and high-energy classes.</p>
+            <div class="d-flex gap-2 mb-3">
+              <span class="btn btn-sm rounded-pill text-white" style="background:linear-gradient(135deg,var(--p),var(--s))">Start now</span>
+              <span class="btn btn-sm rounded-pill" style="border:1px solid var(--p);color:var(--p)">View plans</span>
+            </div>
+            <div class="rounded-3 p-3" style="background:var(--sf);border:1px solid rgba(255,255,255,.08)">
+              <div class="d-flex gap-2 align-items-center">
+                <span class="d-inline-flex align-items-center justify-content-center rounded-3" style="width:36px;height:36px;background:linear-gradient(135deg,var(--p),var(--s));color:#fff"><i class="bi bi-trophy"></i></span>
+                <div><div class="pv-head" style="color:#fff">Quarterly</div><div class="small pv-body" style="opacity:.7">{{ GYM.currency }}4,000 / 3 months</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</form>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function () {
+  const form = document.getElementById("colorsForm");
+  const pv = document.getElementById("sitePreview");
+  const root = document.documentElement;
+  const map = { id_primary_color: "--p", id_secondary_color: "--s", id_accent_color: "--a", id_background_color: "--bg", id_surface_color: "--sf", id_text_color: "--tx" };
+  const dash = { id_dash_primary_color: "--dash-primary", id_dash_secondary_color: "--dash-primary-2", id_dash_sidebar_color: "--dash-sidebar" };
+  function hexRgb(h) { const v = h.replace("#", ""); return [0, 2, 4].map(i => parseInt(v.substr(i, 2), 16)).join(", "); }
+  function update() {
+    Object.entries(map).forEach(([id, v]) => { const el = document.getElementById(id); if (el) pv.style.setProperty(v, el.value); });
+    Object.entries(dash).forEach(([id, v]) => { const el = document.getElementById(id); if (el) root.style.setProperty(v, el.value); });
+    const p = document.getElementById("id_dash_primary_color"), s = document.getElementById("id_dash_secondary_color");
+    if (p && s) {
+      root.style.setProperty("--dash-grad", `linear-gradient(135deg, ${p.value}, ${s.value})`);
+      root.style.setProperty("--dash-primary-rgb", hexRgb(p.value));
+    }
+    const hf = document.getElementById("id_heading_font"), bf = document.getElementById("id_body_font");
+    loadFont(hf.value); loadFont(bf.value);
+    pv.querySelectorAll(".pv-head").forEach(e => e.style.fontFamily = `"${hf.value}", sans-serif`);
+    pv.querySelectorAll(".pv-body").forEach(e => e.style.fontFamily = `"${bf.value}", sans-serif`);
+  }
+  const loaded = {};
+  function loadFont(name) {
+    if (loaded[name]) return; loaded[name] = true;
+    const l = document.createElement("link"); l.rel = "stylesheet";
+    l.href = "https://fonts.googleapis.com/css2?family=" + name.replace(/ /g, "+") + "&display=swap";
+    document.head.appendChild(l);
+  }
+  form.addEventListener("input", update);
+  form.addEventListener("change", update);
+  document.querySelectorAll(".preset-btn").forEach(btn => btn.addEventListener("click", () => {
+    const set = (id, v) => { const el = document.getElementById(id); if (el) el.value = v; };
+    set("id_primary_color", btn.dataset.primary); set("id_secondary_color", btn.dataset.secondary);
+    set("id_accent_color", btn.dataset.accent); set("id_background_color", btn.dataset.bg);
+    set("id_surface_color", btn.dataset.surface);
+    set("id_dash_primary_color", btn.dataset.primary); set("id_dash_secondary_color", btn.dataset.secondary);
+    update();
+  }));
+  update();
+})();
+</script>
+{% endblock %}

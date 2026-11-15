@@ -1,0 +1,22 @@
+<div class="col-sm-6 col-lg-3" data-reveal="up" data-delay=".{{ forloop.counter0|default:0 }}">
+  <div class="trainer-card h-100" data-tilt>
+    <div class="trainer-photo">
+      {% if trainer.photo %}
+        <img src="{{ trainer.photo.url }}" alt="{{ trainer.name }}">
+      {% else %}
+        <span class="initial">{{ trainer.name|slice:":1" }}</span>
+      {% endif %}
+      <div class="trainer-social">
+        {% if trainer.instagram %}<a href="{{ trainer.instagram }}" target="_blank" rel="noopener" aria-label="Instagram"><i class="bi bi-instagram"></i></a>{% endif %}
+        {% if trainer.email %}<a href="mailto:{{ trainer.email }}" aria-label="Email"><i class="bi bi-envelope"></i></a>{% endif %}
+        <a href="{% url 'gym:schedule' %}" aria-label="Classes"><i class="bi bi-calendar-week"></i></a>
+      </div>
+    </div>
+    <div class="trainer-info">
+      <span class="tag">{{ trainer.experience_years }}+ yrs exp</span>
+      <h5>{{ trainer.name }}</h5>
+      <div class="text-primary-li small fw-semibold">{{ trainer.specialization }}</div>
+      {% if show_bio and trainer.bio %}<p class="small text-muted mt-2 mb-0">{{ trainer.bio }}</p>{% endif %}
+    </div>
+  </div>
+</div>

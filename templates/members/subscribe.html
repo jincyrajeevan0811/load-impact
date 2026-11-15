@@ -1,0 +1,38 @@
+{% extends 'members/_base.html' %}
+{% block title %}Subscribe – {{ plan.name }}{% endblock %}
+{% block member_content %}
+<div class="row g-4 justify-content-center">
+  <div class="col-lg-5">
+    <div class="card-li no-hover p-4 h-100">
+      <div class="section-subtitle">Order summary</div>
+      <h3 class="text-uppercase mt-1">{{ plan.name }}</h3>
+      <p class="text-muted">{{ plan.description }}</p>
+      <div class="price">{{ GYM.currency }}{{ plan.price|floatformat:2 }} <small>/ {{ plan.duration_label }}</small></div>
+      <ul class="list-unstyled feature-list mt-3">
+        {% for f in plan.feature_list %}<li><i class="bi bi-check-circle-fill"></i>{{ f }}</li>{% endfor %}
+      </ul>
+      {% if current %}
+        <div class="alert alert-info small mb-0"><i class="bi bi-arrow-repeat"></i> You already have an active plan until {{ current.end_date|date:"d M Y" }}. This new plan will start the day after it ends.</div>
+      {% endif %}
+    </div>
+  </div>
+  <div class="col-lg-6">
+    <div class="card-li no-hover p-4">
+      <h4 class="mb-3">Payment details</h4>
+      <div class="alert alert-light border small">
+        <strong>How to pay:</strong><br>
+        <i class="bi bi-cash"></i> <strong>Cash / Card</strong> – pay at the front desk.<br>
+        <i class="bi bi-qr-code"></i> <strong>UPI</strong> – pay to <code>{{ GYM.upi_id }}</code> and enter the UPI reference number.<br>
+        <i class="bi bi-bank"></i> <strong>Bank transfer</strong> – contact us for account details.<br>
+        Your membership will be activated once the payment is verified.
+      </div>
+      <form method="post" novalidate>
+        {% csrf_token %}
+        {% include 'includes/form_fields.html' %}
+        <button type="submit" class="btn btn-li w-100 mt-4">Submit Request – {{ GYM.currency }}{{ plan.price|floatformat:0 }}</button>
+      </form>
+      <a href="{% url 'gym:plans' %}" class="d-block text-center small mt-3">Choose a different plan</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

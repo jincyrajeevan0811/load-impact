@@ -1,0 +1,54 @@
+{% extends 'dashboard/base.html' %}
+{% block title %}{{ page_title }}{% endblock %}
+{% block page_title %}Appearance · {{ page_title }}{% endblock %}
+{% block content %}
+{% include 'dashboard/appearance/_tabs.html' %}
+<div class="row g-3">
+  <div class="col-xl-8">
+    <div class="panel">
+      <div class="panel-title">{{ page_title }}</div>
+      <form method="post" enctype="multipart/form-data" novalidate>
+        {% csrf_token %}
+        {% include 'includes/form_fields.html' with cols='col-md-6' %}
+        <div class="d-flex gap-2 mt-4">
+          <button type="submit" class="btn btn-dash"><i class="bi bi-check2"></i> Save changes</button>
+          <a href="{% url 'gym:home' %}" target="_blank" class="btn btn-light"><i class="bi bi-eye"></i> View website</a>
+        </div>
+      </form>
+    </div>
+  </div>
+  <div class="col-xl-4">
+    {% if tab == 'branding' %}
+    <div class="panel mb-3">
+      <div class="panel-title">Current logo</div>
+      <div class="rounded-4 p-4 d-flex align-items-center justify-content-center" style="background:{{ site.background_color }}">
+        {% if site.logo %}
+          <img src="{{ site.logo.url }}" alt="Logo" style="height:{{ site.logo_height }}px;max-width:100%">
+        {% else %}
+          <span class="d-inline-flex align-items-center justify-content-center rounded-3 me-2" style="width:44px;height:44px;background:linear-gradient(135deg,{{ site.primary_color }},{{ site.secondary_color }});color:#fff"><i class="bi {{ site.brand_icon }}"></i></span>
+          <span class="display-font fs-2" style="color:#fff">{{ site.brand_text_1 }}<span style="color:{{ site.primary_color }}">{{ site.brand_text_2 }}</span></span>
+        {% endif %}
+      </div>
+    </div>
+    <div class="panel">
+      <div class="panel-title">Tips</div>
+      <ul class="small text-muted ps-3 mb-0">
+        <li class="mb-2">Upload a logo to replace the icon + text logo everywhere (header, footer, loading screen, dashboard). Tick "Clear" to go back to the text logo.</li>
+        <li class="mb-2">Icons: pick any name from <a href="https://icons.getbootstrap.com/" target="_blank" rel="noopener">icons.getbootstrap.com</a>, e.g. <code>bi-trophy-fill</code>.</li>
+        <li>Turn off animations if the site should feel calmer or faster on older phones.</li>
+      </ul>
+    </div>
+    {% else %}
+    <div class="panel">
+      <div class="panel-title">Where this appears</div>
+      <ul class="small text-muted ps-3 mb-0">
+        <li class="mb-2">Phone, email, address and hours: footer, contact page, invoices and the hero card.</li>
+        <li class="mb-2">Social links: footer icons (leave blank to hide one).</li>
+        <li class="mb-2">UPI ID: the member checkout page.</li>
+        <li>Footer link list itself is edited under <a href="{% url 'dashboard:appearance_nav' %}">Navigation</a>.</li>
+      </ul>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

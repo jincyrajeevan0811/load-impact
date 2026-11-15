@@ -1,0 +1,11 @@
+<section class="section">
+  <div class="container">
+    <div class="row g-4">
+      {% for trainer in trainers %}
+        {% include 'gym/_trainer_card.html' with show_bio=True %}
+      {% empty %}
+        <p class="text-center text-muted">{{ s.subtitle }}</p>
+      {% endfor %}
+    </div>
+  </div>
+</section>

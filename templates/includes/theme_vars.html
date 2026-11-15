@@ -1,0 +1,25 @@
+{% if SITE %}
+<link href="{{ SITE.google_fonts_url }}" rel="stylesheet">
+<style>
+  :root, html[data-bs-theme] {
+    --li-primary: {{ SITE.primary_color }};
+    --li-primary-2: {{ SITE.secondary_color }};
+    --li-amber: {{ SITE.accent_color }};
+    --li-primary-rgb: {{ SITE.primary_rgb }};
+    --li-secondary-rgb: {{ SITE.secondary_rgb }};
+    --li-accent-rgb: {{ SITE.accent_rgb }};
+    --li-grad: linear-gradient(135deg, {{ SITE.primary_color }} 0%, {{ SITE.secondary_color }} 100%);
+    --li-grad-warm: linear-gradient(135deg, {{ SITE.accent_color }} 0%, {{ SITE.primary_color }} 50%, {{ SITE.secondary_color }} 100%);
+    --li-bg: {{ SITE.background_color }};
+    --li-surface: {{ SITE.surface_color }};
+    --li-surface-2: {{ SITE.surface_2_color }};
+    --li-text: {{ SITE.text_color }};
+    --font-head: "{{ SITE.heading_font }}", sans-serif;
+    --font-body: "{{ SITE.body_font }}", system-ui, sans-serif;
+    --head-weight: {{ SITE.heading_weight }};
+    --logo-h: {{ SITE.logo_height }}px;
+  }
+</style>
+{% else %}
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+{% endif %}

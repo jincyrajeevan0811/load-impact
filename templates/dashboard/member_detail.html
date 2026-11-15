@@ -1,0 +1,151 @@
+{% extends 'dashboard/base.html' %}
+{% block title %}{{ member.get_full_name|default:member.username }}{% endblock %}
+{% block page_title %}Member Profile{% endblock %}
+{% block content %}
+{% with p=member.profile %}
+<div class="row g-3">
+  <div class="col-xl-4">
+    <div class="panel text-center mb-3">
+      {% if p.photo %}<img src="{{ p.photo.url }}" class="avatar-sm avatar-xl" alt="">{% else %}<span class="avatar-sm avatar-xl">{{ member.first_name|default:member.username|slice:":1"|upper }}</span>{% endif %}
+      <h4 class="mt-3 mb-0">{{ member.get_full_name|default:member.username }}</h4>
+      <div class="text-muted small">@{{ member.username }} · {{ p.member_id }}</div>
+      <div class="mt-2">
+        {% if member.is_superuser %}<span class="badge text-bg-dark">Super Admin</span>{% elif member.is_staff %}<span class="badge text-bg-secondary">Staff</span>{% endif %}
+        {% if member.is_active %}<span class="badge text-bg-success">Enabled</span>{% else %}<span class="badge text-bg-danger">Disabled</span>{% endif %}
+      </div>
+      <form method="post" action="{% url 'dashboard:member_checkin' member.pk %}" class="mt-3">{% csrf_token %}
+        {% if checked_in_today %}
+          <button class="btn btn-warning w-100"><i class="bi bi-box-arrow-right"></i> Check out (in since {{ checked_in_today.check_in|time:"g:i A" }})</button>
+        {% else %}
+          <button class="btn btn-success w-100"><i class="bi bi-box-arrow-in-right"></i> Check in now</button>
+        {% endif %}
+      </form>
+      <div class="d-grid gap-2 mt-2">
+        <a href="{% url 'dashboard:membership_add' %}?user={{ member.pk }}" class="btn btn-dash"><i class="bi bi-card-checklist"></i> Assign Membership</a>
+        <a href="{% url 'dashboard:payment_add' %}?user={{ member.pk }}" class="btn btn-outline-dark"><i class="bi bi-cash"></i> Record Payment</a>
+      </div>
+      <div class="d-flex flex-wrap gap-2 justify-content-center mt-3">
+        <a href="{% url 'dashboard:member_edit' member.pk %}" class="btn btn-sm btn-light"><i class="bi bi-pencil"></i> Edit</a>
+        <a href="{% url 'dashboard:member_password' member.pk %}" class="btn btn-sm btn-light"><i class="bi bi-key"></i> Password</a>
+        {% if member != user %}
+        <form method="post" action="{% url 'dashboard:member_toggle' member.pk %}" data-confirm="{% if member.is_active %}Disable{% else %}Enable{% endif %} this account?">{% csrf_token %}
+          <button class="btn btn-sm btn-light">{% if member.is_active %}<i class="bi bi-slash-circle"></i> Disable{% else %}<i class="bi bi-check-circle"></i> Enable{% endif %}</button>
+        </form>
+        <a href="{% url 'dashboard:member_delete' member.pk %}" class="btn btn-sm btn-light text-danger"><i class="bi bi-trash"></i> Delete</a>
+        {% endif %}
+      </div>
+    </div>
+    <div class="panel">
+      <div class="panel-title">Details</div>
+      <div class="dl-row"><span>Email</span><span>{{ member.email|default:"—" }}</span></div>
+      <div class="dl-row"><span>Phone</span><span>{{ p.phone|default:"—" }}</span></div>
+      <div class="dl-row"><span>Gender</span><span>{{ p.get_gender_display|default:"—" }}</span></div>
+      <div class="dl-row"><span>Age</span><span>{{ p.age|default:"—" }}</span></div>
+      <div class="dl-row"><span>Height / Weight</span><span>{{ p.height_cm|default:"—" }} cm / {{ p.weight_kg|default:"—" }} kg</span></div>
+      <div class="dl-row"><span>BMI</span><span>{{ p.bmi|default:"—" }} {{ p.bmi_category }}</span></div>
+      <div class="dl-row"><span>Goal</span><span>{{ p.get_fitness_goal_display }}</span></div>
+      <div class="dl-row"><span>Emergency</span><span>{{ p.emergency_contact|default:"—" }}</span></div>
+      <div class="dl-row"><span>Address</span><span class="text-end">{{ p.address|default:"—" }}</span></div>
+      <div class="dl-row"><span>Joined</span><span>{{ member.date_joined|date:"d M Y" }}</span></div>
+      <div class="dl-row"><span>Last login</span><span>{{ member.last_login|date:"d M Y, g:i A"|default:"Never" }}</span></div>
+    </div>
+  </div>
+
+  <div class="col-xl-8">
+    <div class="row g-3 mb-3">
+      <div class="col-md-4"><div class="kpi"><div class="kpi-icon bg-success-subtle text-success"><i class="bi bi-patch-check"></i></div><div>
+        {% if current %}<div class="kpi-value count-up">{{ current.days_left }}d</div><div class="kpi-label">{{ current.plan.name }} left</div>{% else %}<div class="kpi-value count-up">—</div><div class="kpi-label">No active plan</div>{% endif %}
+      </div></div></div>
+      <div class="col-md-4"><div class="kpi"><div class="kpi-icon bg-info-subtle text-info"><i class="bi bi-door-open"></i></div><div><div class="kpi-value count-up">{{ visits_month }}</div><div class="kpi-label">Visits this month</div></div></div></div>
+      <div class="col-md-4"><div class="kpi"><div class="kpi-icon bg-warning-subtle text-warning"><i class="bi bi-wallet2"></i></div><div><div class="kpi-value count-up">{{ GYM.currency }}{{ total_paid|floatformat:0 }}</div><div class="kpi-label">Total paid</div></div></div></div>
+    </div>
+
+    <div class="panel mb-3">
+      <div class="panel-title">Memberships</div>
+      <div class="table-responsive">
+        <table class="table table-dash">
+          <thead><tr><th>Plan</th><th>Start</th><th>End</th><th>Status</th><th></th></tr></thead>
+          <tbody>
+          {% for m in memberships %}
+            <tr>
+              <td class="fw-semibold">{{ m.plan.name }}</td>
+              <td>{{ m.start_date|date:"d M Y"|default:"—" }}</td>
+              <td>{{ m.end_date|date:"d M Y"|default:"—" }}</td>
+              <td>{% include 'includes/status_badge.html' with status=m.status label=m.get_status_display %}</td>
+              <td class="text-end text-nowrap">
+                {% if m.status == 'pending' %}
+                <form method="post" action="{% url 'dashboard:membership_activate' m.pk %}" class="d-inline">{% csrf_token %}
+                  <input type="hidden" name="next" value="{{ request.path }}">
+                  <button class="btn btn-sm btn-success">Activate</button>
+                </form>
+                {% endif %}
+                <a href="{% url 'dashboard:membership_edit' m.pk %}" class="btn btn-sm btn-light"><i class="bi bi-pencil"></i></a>
+              </td>
+            </tr>
+          {% empty %}
+            <tr><td colspan="5" class="text-muted">No memberships.</td></tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="panel mb-3">
+      <div class="panel-title">Recent payments</div>
+      <div class="table-responsive">
+        <table class="table table-dash">
+          <thead><tr><th>Invoice</th><th>Date</th><th>Amount</th><th>Method</th><th>Status</th><th></th></tr></thead>
+          <tbody>
+          {% for pay in payments %}
+            <tr>
+              <td>{{ pay.invoice_no }}</td>
+              <td>{{ pay.created_at|date:"d M Y" }}</td>
+              <td>{{ GYM.currency }}{{ pay.amount|floatformat:2 }}</td>
+              <td>{{ pay.get_method_display }}</td>
+              <td>{% include 'includes/status_badge.html' with status=pay.status label=pay.get_status_display %}</td>
+              <td class="text-end text-nowrap">
+                {% if pay.status == 'pending' %}
+                <form method="post" action="{% url 'dashboard:payment_paid' pay.pk %}" class="d-inline">{% csrf_token %}
+                  <input type="hidden" name="next" value="{{ request.path }}">
+                  <button class="btn btn-sm btn-success">Mark paid</button>
+                </form>
+                {% endif %}
+                <a href="{% url 'members:invoice' pay.pk %}" class="btn btn-sm btn-light" title="Invoice"><i class="bi bi-receipt"></i></a>
+              </td>
+            </tr>
+          {% empty %}
+            <tr><td colspan="6" class="text-muted">No payments.</td></tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="row g-3">
+      <div class="col-md-6">
+        <div class="panel h-100">
+          <div class="panel-title">Recent bookings</div>
+          {% for b in bookings %}
+            <div class="d-flex justify-content-between border-bottom py-2 small">
+              <span>{{ b.gym_class.name }} · {{ b.date|date:"d M" }}</span>
+              {% include 'includes/status_badge.html' with status=b.status label=b.get_status_display %}
+            </div>
+          {% empty %}<p class="text-muted small mb-0">No bookings.</p>{% endfor %}
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="panel h-100">
+          <div class="panel-title">Recent visits</div>
+          {% for a in attendance %}
+            <div class="d-flex justify-content-between border-bottom py-2 small">
+              <span>{{ a.date|date:"D, d M" }}</span>
+              <span class="text-muted">{{ a.check_in|time:"g:i A" }}{% if a.check_out %} – {{ a.check_out|time:"g:i A" }}{% endif %}</span>
+            </div>
+          {% empty %}<p class="text-muted small mb-0">No visits.</p>{% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endwith %}
+{% endblock %}

@@ -1,0 +1,127 @@
+{% extends 'members/_base.html' %}
+{% block title %}My Dashboard – {{ GYM.name }}{% endblock %}
+{% block member_heading %}Hey, {{ user.first_name|default:user.username }} 👋{% endblock %}
+{% block member_content %}
+{% if current %}
+  <div class="membership-hero mb-4" data-reveal="up">
+    <div class="row align-items-center g-4">
+      <div class="col-md-8">
+        <span class="badge rounded-pill text-bg-success mb-2"><i class="bi bi-circle-fill me-1" style="font-size:.5rem"></i> ACTIVE MEMBERSHIP</span>
+        <h2 class="display-font mb-1" style="font-size:3rem">{{ current.plan.name }}</h2>
+        <p class="mb-4 text-white-50"><i class="bi bi-calendar-range me-1"></i> {{ current.start_date|date:"d M Y" }} → {{ current.end_date|date:"d M Y" }}</p>
+        <div class="d-flex justify-content-between small mb-1"><span class="text-white-50">Plan used</span><span>{{ current.progress_percent }}%</span></div>
+        <div class="progress progress-li"><div class="progress-bar" style="width:0" data-width="{{ current.progress_percent }}"></div></div>
+        {% if current.days_left <= 7 %}
+          <div class="alert alert-warning mt-3 mb-0 py-2 d-flex align-items-center justify-content-between flex-wrap gap-2">
+            <span><i class="bi bi-exclamation-triangle me-1"></i> Your plan ends soon.</span>
+            <a href="{% url 'gym:plans' %}" class="btn btn-li btn-sm py-1">Renew now</a>
+          </div>
+        {% endif %}
+      </div>
+      <div class="col-md-4">
+        <div class="ring" data-p="{% widthratio current.days_left current.plan.duration_days 100 %}">
+          <div class="ring-content"><div class="num count-up">{{ current.days_left }}</div><div class="small text-white-50">days left</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% if upcoming_membership %}
+    <div class="alert alert-info"><i class="bi bi-arrow-repeat"></i> Your renewal <strong>{{ upcoming_membership.plan.name }}</strong> starts on {{ upcoming_membership.start_date|date:"d M Y" }}.</div>
+  {% endif %}
+{% elif pending %}
+  <div class="membership-hero mb-4 d-flex gap-3 align-items-center" data-reveal="up">
+    <div class="feature-icon flex-shrink-0"><i class="bi bi-hourglass-split"></i></div>
+    <div><h3 class="display-font mb-1">{{ pending.plan.name }} – awaiting confirmation</h3><p class="mb-0 text-white-50">Your plan will be activated as soon as the front desk verifies your payment.</p></div>
+  </div>
+{% else %}
+  <div class="membership-hero mb-4" data-reveal="up">
+    <h3 class="display-font" style="font-size:2.4rem">You don't have an active membership</h3>
+    <p class="text-white-50">Choose a plan to unlock class booking and full gym access.</p>
+    <div class="row g-4 mt-1 align-items-center">
+      {% for plan in plans %}
+        {% include 'gym/_plan_card.html' %}
+      {% endfor %}
+    </div>
+  </div>
+{% endif %}
+{% if pending and current %}
+  <div class="alert alert-warning"><i class="bi bi-hourglass-split"></i> Your request for <strong>{{ pending.plan.name }}</strong> is awaiting payment confirmation.</div>
+{% endif %}
+
+<div class="row g-3 mb-4">
+  <div class="col-6 col-lg-3" data-reveal="up">
+    <div class="stat-card">
+      <div class="icon bg-primary-subtle text-primary-emphasis mb-3"><i class="bi bi-door-open"></i></div>
+      <div class="value count-up">{{ visits_this_month }}</div><div class="small text-muted">Visits this month</div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-3" data-reveal="up" data-delay=".1">
+    <div class="stat-card">
+      <div class="icon bg-success-subtle text-success-emphasis mb-3"><i class="bi bi-check2-circle"></i></div>
+      <div class="value count-up">{{ classes_attended }}</div><div class="small text-muted">Classes attended</div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-3" data-reveal="up" data-delay=".2">
+    <div class="stat-card">
+      <div class="icon bg-warning-subtle text-warning-emphasis mb-3"><i class="bi bi-calendar-event"></i></div>
+      <div class="value count-up">{{ upcoming_bookings|length }}</div><div class="small text-muted">Upcoming classes</div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-3" data-reveal="up" data-delay=".3">
+    <div class="stat-card">
+      <div class="icon bg-danger-subtle text-danger-emphasis mb-3"><i class="bi bi-activity"></i></div>
+      <div class="value">{{ user.profile.bmi|default:"—" }}</div><div class="small text-muted">BMI {% if user.profile.bmi_category %}· {{ user.profile.bmi_category }}{% else %}· <a href="{% url 'accounts:profile_edit' %}">add details</a>{% endif %}</div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-4">
+  <div class="col-lg-7" data-reveal="left">
+    <div class="card-li no-hover p-4 h-100">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4 class="text-white mb-0">Upcoming Classes</h4>
+        <a href="{% url 'members:bookings' %}" class="small">View all <i class="bi bi-arrow-right"></i></a>
+      </div>
+      {% for b in upcoming_bookings %}
+        <div class="class-row mb-2 py-3" style="grid-template-columns: 90px 1fr auto">
+          <div class="time" style="font-size:1.3rem">{{ b.date|date:"d M" }}<small>{{ b.date|date:"l" }}</small></div>
+          <div><h5 style="font-size:1.25rem">{{ b.gym_class.name }}</h5><div class="small text-muted">{{ b.gym_class.start_time|time:"g:i A" }}{% if b.gym_class.trainer %} · {{ b.gym_class.trainer.name }}{% endif %}</div></div>
+          <span class="level-pill">Booked</span>
+        </div>
+      {% empty %}
+        <div class="text-center py-4">
+          <i class="bi bi-calendar-x fs-1 text-primary-li"></i>
+          <p class="text-muted mt-2">No upcoming classes.</p>
+          <a href="{% url 'members:classes' %}" class="btn btn-li btn-sm">Book one now</a>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+  <div class="col-lg-5" data-reveal="right">
+    <div class="card-li no-hover p-4 mb-4">
+      <h4 class="text-white mb-3"><i class="bi bi-megaphone text-primary-li"></i> Announcements</h4>
+      {% for a in announcements %}
+        <div class="mb-3 pb-3 {% if not forloop.last %}border-bottom{% endif %}">
+          <div class="fw-semibold text-white">{{ a.title }}</div>
+          <div class="small text-muted">{{ a.content|truncatewords:25 }}</div>
+          <div class="small text-muted fst-italic mt-1">{{ a.created_at|timesince }} ago</div>
+        </div>
+      {% empty %}
+        <p class="text-muted mb-0">No announcements right now.</p>
+      {% endfor %}
+    </div>
+    <div class="card-li no-hover p-4">
+      <h4 class="text-white mb-3">Recent Check-ins</h4>
+      {% for r in recent_attendance %}
+        <div class="d-flex justify-content-between small border-bottom py-2">
+          <span><i class="bi bi-check-circle-fill text-success me-1"></i> {{ r.date|date:"D, d M" }}</span>
+          <span class="text-muted">{{ r.check_in|time:"g:i A" }}{% if r.check_out %} – {{ r.check_out|time:"g:i A" }}{% endif %}</span>
+        </div>
+      {% empty %}
+        <p class="text-muted mb-0 small">No visits recorded yet.</p>
+      {% endfor %}
+      <div class="small text-muted mt-3">Total invested in your fitness: <strong class="text-white">{{ GYM.currency }}{{ total_spent|floatformat:0 }}</strong></div>
+    </div>
+  </div>
+</div>
+{% endblock %}

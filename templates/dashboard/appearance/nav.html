@@ -1,0 +1,45 @@
+{% extends 'dashboard/base.html' %}
+{% block title %}Navigation{% endblock %}
+{% block page_title %}Appearance · Navigation{% endblock %}
+{% block content %}
+{% include 'dashboard/appearance/_tabs.html' %}
+<div class="row g-3">
+  <div class="col-xl-8">
+    <div class="panel mb-3">
+      <div class="panel-title"><span><i class="bi bi-window-desktop me-1"></i> Header menu</span><a href="?location=header#addLink" class="small fw-normal">+ Add header link</a></div>
+      {% include 'dashboard/appearance/_nav_table.html' with links=header_links %}
+    </div>
+    <div class="panel mb-3">
+      <div class="panel-title"><span><i class="bi bi-layout-text-window-reverse me-1"></i> Footer links</span><a href="?location=footer#addLink" class="small fw-normal">+ Add footer link</a></div>
+      {% include 'dashboard/appearance/_nav_table.html' with links=footer_links %}
+      <div class="small text-muted mt-2">The footer column title, social icons and contact details are under <a href="{% url 'dashboard:appearance_contact' %}">Contact &amp; Footer</a>.</div>
+    </div>
+  </div>
+  <div class="col-xl-4">
+    <div class="panel position-sticky" style="top:90px" id="addLink">
+      <div class="panel-title">Add a link</div>
+      <form method="post" novalidate>
+        {% csrf_token %}
+        {% include 'includes/form_fields.html' %}
+        <div class="mt-3">
+          <div class="small text-muted mb-1">Quick fill a page:</div>
+          <div class="d-flex flex-wrap gap-1">
+            {% for label, url in quick_pages %}
+              <button type="button" class="btn btn-sm btn-light quick-link" data-label="{{ label }}" data-url="{{ url }}">{{ label }}</button>
+            {% endfor %}
+          </div>
+        </div>
+        <button class="btn btn-dash w-100 mt-3"><i class="bi bi-plus-lg"></i> Add link</button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script>
+  document.querySelectorAll(".quick-link").forEach(b => b.addEventListener("click", () => {
+    document.getElementById("id_label").value = b.dataset.label.replace("Join / Register", "Join");
+    document.getElementById("id_url").value = b.dataset.url;
+  }));
+</script>
+{% endblock %}

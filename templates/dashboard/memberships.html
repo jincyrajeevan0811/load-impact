@@ -1,0 +1,59 @@
+{% extends 'dashboard/base.html' %}
+{% load dash_extras %}
+{% block title %}Memberships{% endblock %}
+{% block page_title %}Memberships{% endblock %}
+{% block content %}
+<div class="panel">
+  <div class="d-flex flex-wrap justify-content-between gap-2 mb-3">
+    <ul class="nav nav-pills flex-wrap">
+      <li class="nav-item"><a class="nav-link {% if not status %}active bg-dark{% endif %}" href="?">All</a></li>
+      {% for value, label in status_choices %}
+        <li class="nav-item"><a class="nav-link {% if status == value %}active bg-dark{% endif %}" href="?status={{ value }}">{{ label }} <span class="badge text-bg-light">{{ counts|get_item:value }}</span></a></li>
+      {% endfor %}
+    </ul>
+    <a href="{% url 'dashboard:membership_add' %}" class="btn btn-dash btn-sm"><i class="bi bi-plus-lg"></i> Assign Membership</a>
+  </div>
+  <form class="row g-2 mb-3" method="get">
+    <input type="hidden" name="status" value="{{ status }}">
+    <div class="col-md-6"><input type="search" name="q" value="{{ q }}" class="form-control" placeholder="Search member or plan"></div>
+    <div class="col-md-2"><button class="btn btn-dark w-100">Search</button></div>
+  </form>
+  <div class="table-responsive">
+    <table class="table table-dash table-hover">
+      <thead><tr><th>Member</th><th>Plan</th><th>Start</th><th>End</th><th>Days left</th><th>Status</th><th>Created</th><th></th></tr></thead>
+      <tbody>
+      {% for m in page_obj %}
+        <tr>
+          <td><a href="{% url 'dashboard:member_detail' m.user.pk %}" class="fw-semibold">{{ m.user.get_full_name|default:m.user.username }}</a></td>
+          <td>{{ m.plan.name }}</td>
+          <td>{{ m.start_date|date:"d M Y"|default:"—" }}</td>
+          <td>{{ m.end_date|date:"d M Y"|default:"—" }}</td>
+          <td>{% if m.status == 'active' %}{{ m.days_left }}{% else %}—{% endif %}</td>
+          <td>{% include 'includes/status_badge.html' with status=m.status label=m.get_status_display %}</td>
+          <td class="small text-muted">{{ m.created_at|date:"d M Y" }}</td>
+          <td class="text-end text-nowrap">
+            {% if m.status == 'pending' %}
+              <form method="post" action="{% url 'dashboard:membership_activate' m.pk %}" class="d-inline" data-confirm="Confirm payment and activate?">{% csrf_token %}
+                <input type="hidden" name="next" value="{{ request.get_full_path }}">
+                <button class="btn btn-sm btn-success" title="Activate"><i class="bi bi-check2"></i></button>
+              </form>
+            {% endif %}
+            {% if m.status == 'active' or m.status == 'pending' %}
+              <form method="post" action="{% url 'dashboard:membership_cancel' m.pk %}" class="d-inline" data-confirm="Cancel this membership?">{% csrf_token %}
+                <input type="hidden" name="next" value="{{ request.get_full_path }}">
+                <button class="btn btn-sm btn-light" title="Cancel"><i class="bi bi-x-circle"></i></button>
+              </form>
+            {% endif %}
+            <a href="{% url 'dashboard:membership_edit' m.pk %}" class="btn btn-sm btn-light"><i class="bi bi-pencil"></i></a>
+            <a href="{% url 'dashboard:membership_delete' m.pk %}" class="btn btn-sm btn-light text-danger"><i class="bi bi-trash"></i></a>
+          </td>
+        </tr>
+      {% empty %}
+        <tr><td colspan="8" class="text-center text-muted py-4">No memberships found.</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% include 'dashboard/_pagination.html' %}
+</div>
+{% endblock %}

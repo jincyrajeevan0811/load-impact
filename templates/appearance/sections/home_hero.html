@@ -1,0 +1,52 @@
+<section class="hero">
+  <div class="hero-bg" style="--hero-img: url('{{ s.img }}')"></div>
+  <div class="blob blob-1"></div>
+  <div class="blob blob-2"></div>
+  <div class="container">
+    <div class="row align-items-center g-5">
+      <div class="col-lg-7">
+        {% if s.eyebrow %}<span class="hero-badge" data-reveal="down"><span class="dot"><i class="bi bi-gender-ambiguous"></i></span> {{ s.eyebrow }}</span>{% endif %}
+        <h1 data-reveal="up" data-delay=".1">
+          {{ s.title }}{% if s.extra_list %}<br>
+          <span class="text-gradient rotating" data-rotate="{{ s.extra }}">{{ s.extra_list.0 }}</span>{% endif %}
+          {% if s.highlight %}<br><span class="text-outline">{{ s.highlight }}</span>{% endif %}
+        </h1>
+        {% if s.subtitle %}<p class="lead mb-4" data-reveal="up" data-delay=".2">{{ s.subtitle }}</p>{% endif %}
+        <div class="d-flex flex-wrap align-items-center gap-3" data-reveal="up" data-delay=".3">
+          {% if s.button_text %}
+            {% if user.is_authenticated and 'register' in s.button_url %}
+              <a href="{% url 'members:dashboard' %}" class="btn btn-li btn-lg">My Dashboard <i class="bi bi-arrow-right ms-1"></i></a>
+            {% else %}
+              <a href="{{ s.button_url|default:'#' }}" class="btn btn-li btn-lg">{{ s.button_text }} <i class="bi bi-arrow-right ms-1"></i></a>
+            {% endif %}
+          {% endif %}
+          {% if s.button_2_text %}
+          <a href="{{ s.button_2_url|default:'#' }}" class="d-inline-flex align-items-center gap-3 text-white text-decoration-none fw-semibold ms-1">
+            <span class="btn-play"><i class="bi bi-play-fill"></i></span> {{ s.button_2_text }}
+          </a>
+          {% endif %}
+        </div>
+        {% if S_all.stats.item_list %}
+        <div class="hero-stats" data-reveal="up" data-delay=".4">
+          {% for item in S_all.stats.item_list|slice:":3" %}
+            <div><div class="num count-up">{{ item.value }}</div><div class="lbl">{{ item.text }}</div></div>
+          {% endfor %}
+        </div>
+        {% endif %}
+      </div>
+      <div class="col-lg-5 d-none d-lg-block">
+        <div class="hero-visual" data-reveal="zoom" data-delay=".2">
+          <div class="hero-ring"></div>
+          <div class="hero-photo" style="--photo: url('{{ s.img2 }}')" data-parallax="-15"></div>
+          {% for item in s.item_list|slice:":3" %}
+          <div class="hero-card" style="{% cycle 'top: 40px; left: -10px;' 'bottom: 70px; right: -20px; animation-delay: -3s;' 'bottom: 0; left: 30px; animation-delay: -1.5s;' %}" data-parallax="{% cycle '25' '35' '15' %}">
+            <div class="ic"><i class="bi {{ item.icon|default:'bi-star' }}"></i></div>
+            <div><strong>{{ item.title }}</strong><small>{{ item.text }}</small></div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="scroll-indicator d-none d-md-block"></div>
+</section>

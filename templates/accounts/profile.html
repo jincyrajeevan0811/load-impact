@@ -1,0 +1,48 @@
+{% extends 'members/_base.html' %}
+{% block title %}My Profile – {{ GYM.name }}{% endblock %}
+{% block member_content %}
+<div class="row g-4">
+  <div class="col-lg-4">
+    <div class="card-li no-hover p-4 text-center h-100">
+      <div class="mb-3">
+        {% if profile.photo %}
+          <img src="{{ profile.photo.url }}" alt="Profile photo" class="avatar-lg">
+        {% else %}
+          <span class="avatar-lg avatar-placeholder">{{ user.first_name|default:user.username|slice:":1"|upper }}</span>
+        {% endif %}
+      </div>
+      <h4 class="mb-0">{{ user.get_full_name|default:user.username }}</h4>
+      <div class="text-muted small">@{{ user.username }}</div>
+      <span class="badge rounded-pill text-bg-dark mt-2">Member ID: {{ profile.member_id }}</span>
+      <div class="small text-muted mt-2">Joined {{ user.date_joined|date:"d M Y" }}</div>
+      <div class="d-grid gap-2 mt-4">
+        <a href="{% url 'accounts:profile_edit' %}" class="btn btn-li"><i class="bi bi-pencil"></i> Edit Profile</a>
+        <a href="{% url 'accounts:password_change' %}" class="btn btn-outline-li"><i class="bi bi-key"></i> Change Password</a>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-8">
+    <div class="card-li no-hover p-4 mb-4">
+      <h5 class="mb-3">Personal Details</h5>
+      <div class="row g-3">
+        <div class="col-sm-6"><div class="small text-muted">Email</div><div class="fw-semibold">{{ user.email|default:"—" }}</div></div>
+        <div class="col-sm-6"><div class="small text-muted">Phone</div><div class="fw-semibold">{{ profile.phone|default:"—" }}</div></div>
+        <div class="col-sm-6"><div class="small text-muted">Gender</div><div class="fw-semibold">{{ profile.get_gender_display|default:"—" }}</div></div>
+        <div class="col-sm-6"><div class="small text-muted">Date of Birth</div><div class="fw-semibold">{% if profile.date_of_birth %}{{ profile.date_of_birth|date:"d M Y" }} ({{ profile.age }} yrs){% else %}—{% endif %}</div></div>
+        <div class="col-sm-6"><div class="small text-muted">Emergency Contact</div><div class="fw-semibold">{{ profile.emergency_contact|default:"—" }}</div></div>
+        <div class="col-sm-6"><div class="small text-muted">Address</div><div class="fw-semibold">{{ profile.address|default:"—"|linebreaksbr }}</div></div>
+      </div>
+    </div>
+    <div class="card-li no-hover p-4">
+      <h5 class="mb-3">Fitness Stats</h5>
+      <div class="row g-3 text-center">
+        <div class="col-6 col-md-3"><div class="stat-card"><div class="small text-muted">Height</div><div class="value">{{ profile.height_cm|default:"—" }}</div><div class="small">cm</div></div></div>
+        <div class="col-6 col-md-3"><div class="stat-card"><div class="small text-muted">Weight</div><div class="value">{{ profile.weight_kg|default:"—" }}</div><div class="small">kg</div></div></div>
+        <div class="col-6 col-md-3"><div class="stat-card"><div class="small text-muted">BMI</div><div class="value">{{ profile.bmi|default:"—" }}</div><div class="small">{{ profile.bmi_category }}</div></div></div>
+        <div class="col-6 col-md-3"><div class="stat-card"><div class="small text-muted">Goal</div><div class="fw-bold mt-2">{{ profile.get_fitness_goal_display }}</div></div></div>
+      </div>
+      {% if not profile.bmi %}<p class="small text-muted mt-3 mb-0"><i class="bi bi-info-circle"></i> Add your height and weight to see your BMI.</p>{% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

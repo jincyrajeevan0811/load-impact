@@ -1,0 +1,12 @@
+{% if s.item_list %}
+<section class="section">
+  <div class="container">
+    <div class="text-center mb-5" data-reveal="up">{% include 'appearance/_heading.html' with center=True lead=True %}</div>
+    <div class="gallery-grid">
+      {% for item in s.item_list %}
+        <div class="gallery-item" role="img" aria-label="{{ item.title }}" style="--img: url('{{ item.img }}')" data-reveal="zoom" data-delay=".{{ forloop.counter0 }}"></div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}

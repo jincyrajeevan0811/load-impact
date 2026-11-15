@@ -1,0 +1,42 @@
+{% extends 'dashboard/base.html' %}
+{% block title %}Class Schedule{% endblock %}
+{% block page_title %}Class Schedule{% endblock %}
+{% block content %}
+<div class="panel">
+  <div class="d-flex flex-wrap justify-content-between gap-2 mb-3">
+    <div class="btn-group flex-wrap" role="group" aria-label="Filter by day">
+      <a href="?" class="btn btn-sm {% if not selected_day %}btn-dark{% else %}btn-outline-dark{% endif %}">All</a>
+      {% for num, name in days %}
+        <a href="?day={{ num }}" class="btn btn-sm {% if selected_day == num|stringformat:'s' %}btn-dark{% else %}btn-outline-dark{% endif %}">{{ name|slice:":3" }}</a>
+      {% endfor %}
+    </div>
+    <a href="{% url 'dashboard:class_add' %}" class="btn btn-dash btn-sm"><i class="bi bi-plus-lg"></i> Add Class</a>
+  </div>
+  <div class="table-responsive">
+    <table class="table table-dash table-hover">
+      <thead><tr><th>Class</th><th>Day</th><th>Time</th><th>Trainer</th><th>Level</th><th>Location</th><th>Capacity</th><th>Status</th><th></th></tr></thead>
+      <tbody>
+      {% for c in classes %}
+        <tr>
+          <td class="fw-semibold">{{ c.name }}</td>
+          <td>{{ c.get_day_of_week_display }}</td>
+          <td class="text-nowrap">{{ c.start_time|time:"g:i A" }} – {{ c.end_time|time:"g:i A" }}</td>
+          <td>{{ c.trainer.name|default:"—" }}</td>
+          <td>{{ c.get_level_display }}</td>
+          <td>{{ c.location }}</td>
+          <td>{{ c.capacity }}</td>
+          <td>{% if c.is_active %}<span class="badge text-bg-success">Active</span>{% else %}<span class="badge text-bg-secondary">Inactive</span>{% endif %}</td>
+          <td class="text-end text-nowrap">
+            <a href="{% url 'dashboard:booking_list' %}?class={{ c.pk }}" class="btn btn-sm btn-light" title="Bookings"><i class="bi bi-calendar-check"></i></a>
+            <a href="{% url 'dashboard:class_edit' c.pk %}" class="btn btn-sm btn-light"><i class="bi bi-pencil"></i></a>
+            <a href="{% url 'dashboard:class_delete' c.pk %}" class="btn btn-sm btn-light text-danger"><i class="bi bi-trash"></i></a>
+          </td>
+        </tr>
+      {% empty %}
+        <tr><td colspan="9" class="text-center text-muted py-4">No classes found.</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

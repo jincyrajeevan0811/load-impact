@@ -1,0 +1,238 @@
+{% extends 'dashboard/base.html' %}
+{% load humanize %}
+{% block title %}Dashboard{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+{% block content %}
+<div class="welcome-banner mb-4">
+  <i class="bi bi-lightning-charge-fill banner-bolt"></i>
+  <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+    <div>
+      <div class="small text-white-50 text-uppercase" style="letter-spacing:2px">{{ today|date:"l, d F Y" }}</div>
+      <h2>Welcome back, {{ user.first_name|default:user.username }} 💪</h2>
+      <div class="text-white-50">{{ stats.checkins_today }} check-in{{ stats.checkins_today|pluralize }} today · {{ stats.pending_payments }} payment{{ stats.pending_payments|pluralize }} waiting · {{ stats.unread_messages }} unread message{{ stats.unread_messages|pluralize }}</div>
+    </div>
+    <div class="d-flex flex-wrap gap-2">
+      <a href="{% url 'dashboard:member_add' %}" class="btn btn-light btn-sm"><i class="bi bi-person-plus"></i> Add Member</a>
+      <a href="{% url 'dashboard:attendance_list' %}" class="btn btn-outline-light btn-sm"><i class="bi bi-door-open"></i> Check-in</a>
+      <a href="{% url 'dashboard:payment_add' %}" class="btn btn-outline-light btn-sm"><i class="bi bi-cash"></i> Record Payment</a>
+    </div>
+  </div>
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-sm-6 col-xl-3">
+    <div class="kpi"><div class="kpi-icon grad"><i class="bi bi-people"></i></div>
+      <div><div class="kpi-value count-up">{{ stats.total_members|intcomma }}</div><div class="kpi-label">Total members · +{{ stats.new_members_month }} this month</div></div></div>
+  </div>
+  <div class="col-sm-6 col-xl-3">
+    <div class="kpi"><div class="kpi-icon bg-success-subtle text-success"><i class="bi bi-patch-check"></i></div>
+      <div><div class="kpi-value count-up">{{ stats.active_members|intcomma }}</div><div class="kpi-label">Active memberships</div></div></div>
+  </div>
+  <div class="col-sm-6 col-xl-3">
+    <div class="kpi"><div class="kpi-icon bg-warning-subtle text-warning"><i class="bi bi-currency-rupee"></i></div>
+      <div><div class="kpi-value count-up">{{ GYM.currency }}{{ stats.revenue_month|floatformat:0|intcomma }}</div><div class="kpi-label">Revenue this month</div></div></div>
+  </div>
+  <div class="col-sm-6 col-xl-3">
+    <div class="kpi"><div class="kpi-icon bg-danger-subtle text-danger"><i class="bi bi-hourglass-split"></i></div>
+      <div><div class="kpi-value count-up">{{ stats.pending_payments }}</div><div class="kpi-label">Pending payments · {{ GYM.currency }}{{ stats.pending_amount|floatformat:0|intcomma }}</div></div></div>
+  </div>
+  <div class="col-sm-6 col-xl-3">
+    <div class="kpi"><div class="kpi-icon bg-info-subtle text-info"><i class="bi bi-door-open"></i></div>
+      <div><div class="kpi-value count-up">{{ stats.checkins_today }}</div><div class="kpi-label">Check-ins today · {{ stats.in_gym_now }} in gym now</div></div></div>
+  </div>
+  <div class="col-sm-6 col-xl-3">
+    <div class="kpi"><div class="kpi-icon bg-secondary-subtle text-secondary"><i class="bi bi-wallet2"></i></div>
+      <div><div class="kpi-value count-up">{{ GYM.currency }}{{ stats.revenue_total|floatformat:0|intcomma }}</div><div class="kpi-label">Lifetime revenue</div></div></div>
+  </div>
+  <div class="col-sm-6 col-xl-3">
+    <div class="kpi"><div class="kpi-icon bg-primary-subtle text-primary"><i class="bi bi-person-badge"></i></div>
+      <div><div class="kpi-value count-up">{{ stats.trainers }}</div><div class="kpi-label">Trainers · {{ stats.classes }} weekly classes</div></div></div>
+  </div>
+  <div class="col-sm-6 col-xl-3">
+    <a href="{% url 'dashboard:message_list' %}?show=unread" class="text-decoration-none text-reset">
+    <div class="kpi"><div class="kpi-icon bg-danger-subtle text-danger"><i class="bi bi-envelope"></i></div>
+      <div><div class="kpi-value count-up">{{ stats.unread_messages }}</div><div class="kpi-label">Unread messages</div></div></div>
+    </a>
+  </div>
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-lg-8">
+    <div class="panel h-100">
+      <div class="panel-title">Revenue &amp; new members (last 6 months)</div>
+      <div style="height: 300px;"><canvas id="revenueChart"></canvas></div>
+    </div>
+  </div>
+  <div class="col-lg-4">
+    <div class="panel h-100">
+      <div class="panel-title">Members by gender</div>
+      <div style="height: 300px;"><canvas id="genderChart"></canvas></div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-lg-6">
+    <div class="panel h-100">
+      <div class="panel-title">Awaiting approval <a href="{% url 'dashboard:membership_list' %}?status=pending" class="small fw-normal">View all</a></div>
+      <div class="table-responsive">
+        <table class="table table-dash">
+          <thead><tr><th>Member</th><th>Plan</th><th>Requested</th><th></th></tr></thead>
+          <tbody>
+          {% for m in pending_memberships %}
+            <tr>
+              <td><a href="{% url 'dashboard:member_detail' m.user.pk %}">{{ m.user.get_full_name|default:m.user.username }}</a></td>
+              <td>{{ m.plan.name }}</td>
+              <td>{{ m.created_at|naturaltime }}</td>
+              <td class="text-end">
+                <form method="post" action="{% url 'dashboard:membership_activate' m.pk %}" data-confirm="Confirm payment received and activate this membership?">{% csrf_token %}
+                  <input type="hidden" name="next" value="{% url 'dashboard:home' %}">
+                  <button class="btn btn-sm btn-success"><i class="bi bi-check2"></i> Approve</button>
+                </form>
+              </td>
+            </tr>
+          {% empty %}
+            <tr><td colspan="4" class="text-muted">Nothing waiting for approval.</td></tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-6">
+    <div class="panel h-100">
+      <div class="panel-title">Expiring in the next 7 days</div>
+      <div class="table-responsive">
+        <table class="table table-dash">
+          <thead><tr><th>Member</th><th>Plan</th><th>Ends</th><th>Phone</th></tr></thead>
+          <tbody>
+          {% for m in expiring %}
+            <tr>
+              <td><a href="{% url 'dashboard:member_detail' m.user.pk %}">{{ m.user.get_full_name|default:m.user.username }}</a></td>
+              <td>{{ m.plan.name }}</td>
+              <td><span class="badge text-bg-warning">{{ m.end_date|date:"d M" }} · {{ m.days_left }}d</span></td>
+              <td class="small">{{ m.user.profile.phone|default:"—" }}</td>
+            </tr>
+          {% empty %}
+            <tr><td colspan="4" class="text-muted">No memberships expiring this week.</td></tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-3">
+  <div class="col-lg-4">
+    <div class="panel h-100">
+      <div class="panel-title">Today's classes <a href="{% url 'dashboard:booking_list' %}?date={{ today|date:'Y-m-d' }}" class="small fw-normal">Bookings</a></div>
+      {% for item in todays_classes %}
+        <div class="d-flex justify-content-between align-items-center border-bottom py-2">
+          <div>
+            <div class="fw-semibold">{{ item.obj.name }}</div>
+            <small class="text-muted">{{ item.obj.start_time|time:"g:i A" }} · {{ item.obj.trainer.name|default:"No trainer" }}</small>
+          </div>
+          <span class="badge text-bg-light border">{{ item.booked }}/{{ item.obj.capacity }}</span>
+        </div>
+      {% empty %}
+        <p class="text-muted mb-0">No classes scheduled today.</p>
+      {% endfor %}
+    </div>
+  </div>
+  <div class="col-lg-4">
+    <div class="panel h-100">
+      <div class="panel-title">Recent payments <a href="{% url 'dashboard:payment_list' %}" class="small fw-normal">View all</a></div>
+      {% for p in recent_payments %}
+        <div class="d-flex justify-content-between align-items-center border-bottom py-2">
+          <div>
+            <div class="fw-semibold small">{{ p.user.get_full_name|default:p.user.username }}</div>
+            <small class="text-muted">{{ p.invoice_no }} · {{ p.created_at|date:"d M" }}</small>
+          </div>
+          <div class="text-end">
+            <div class="fw-semibold">{{ GYM.currency }}{{ p.amount|floatformat:0|intcomma }}</div>
+            {% include 'includes/status_badge.html' with status=p.status label=p.get_status_display %}
+          </div>
+        </div>
+      {% empty %}
+        <p class="text-muted mb-0">No payments yet.</p>
+      {% endfor %}
+    </div>
+  </div>
+  <div class="col-lg-4">
+    <div class="panel h-100">
+      <div class="panel-title">New members <a href="{% url 'dashboard:member_list' %}" class="small fw-normal">View all</a></div>
+      {% for m in recent_members %}
+        <a href="{% url 'dashboard:member_detail' m.pk %}" class="d-flex align-items-center gap-2 border-bottom py-2 text-decoration-none text-reset">
+          <span class="avatar-sm">{{ m.first_name|default:m.username|slice:":1"|upper }}</span>
+          <div class="flex-grow-1">
+            <div class="fw-semibold small">{{ m.get_full_name|default:m.username }}</div>
+            <small class="text-muted">{{ m.email }}</small>
+          </div>
+          <small class="text-muted">{{ m.date_joined|naturaltime }}</small>
+        </a>
+      {% empty %}
+        <p class="text-muted mb-0">No members yet.</p>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{{ chart_data|json_script:"chart-data" }}
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script>
+  const data = JSON.parse(document.getElementById("chart-data").textContent);
+  const charts = [];
+  function themeColors() {
+    const dark = document.documentElement.getAttribute("data-bs-theme") === "dark";
+    return { text: dark ? "#8d95a5" : "#7b8292", grid: dark ? "rgba(255,255,255,.06)" : "#eef0f4", line: dark ? "#e7eaf0" : "#1f2430", card: dark ? "#141720" : "#ffffff" };
+  }
+  function buildCharts() {
+    charts.forEach((c) => c.destroy());
+    charts.length = 0;
+    const t = themeColors();
+    const css = getComputedStyle(document.documentElement);
+    const p1 = css.getPropertyValue("--dash-primary").trim() || "#ff5a1f";
+    const p2 = css.getPropertyValue("--dash-primary-2").trim() || "#ff2d55";
+    Chart.defaults.color = t.text;
+    Chart.defaults.font.family = "Poppins, sans-serif";
+    const rc = document.getElementById("revenueChart");
+    const ctx = rc.getContext("2d");
+    const grad = ctx.createLinearGradient(0, 0, 0, 300);
+    grad.addColorStop(0, p1);
+    grad.addColorStop(1, p2 + "66");
+    charts.push(new Chart(rc, {
+      data: {
+        labels: data.labels,
+        datasets: [
+          { type: "bar", label: "Revenue ({{ GYM.currency }})", data: data.revenue, backgroundColor: grad, borderRadius: 10, borderSkipped: false, maxBarThickness: 46, yAxisID: "y" },
+          { type: "line", label: "New members", data: data.signups, borderColor: t.line, backgroundColor: t.line, pointBackgroundColor: p1, pointBorderColor: t.card, pointBorderWidth: 3, pointRadius: 5, pointHoverRadius: 8, tension: .4, yAxisID: "y1" }
+        ]
+      },
+      options: {
+        maintainAspectRatio: false,
+        animation: { duration: 1400, easing: "easeOutQuart" },
+        interaction: { mode: "index", intersect: false },
+        plugins: { legend: { labels: { usePointStyle: true, boxWidth: 8 } }, tooltip: { padding: 12, cornerRadius: 10 } },
+        scales: {
+          y: { beginAtZero: true, position: "left", grid: { color: t.grid }, border: { display: false } },
+          y1: { beginAtZero: true, position: "right", grid: { display: false }, ticks: { precision: 0 }, border: { display: false } },
+          x: { grid: { display: false }, border: { display: false } }
+        }
+      }
+    }));
+    charts.push(new Chart(document.getElementById("genderChart"), {
+      type: "doughnut",
+      data: {
+        labels: data.gender_labels.length ? data.gender_labels : ["No data"],
+        datasets: [{ data: data.gender_values.length ? data.gender_values : [1], backgroundColor: [p1, "#3b82f6", "#a855f7", "#94a3b8"], borderColor: t.card, borderWidth: 4, hoverOffset: 10 }]
+      },
+      options: { maintainAspectRatio: false, cutout: "70%", animation: { animateRotate: true, duration: 1400 }, plugins: { legend: { position: "bottom", labels: { usePointStyle: true, boxWidth: 8, padding: 16 } } } }
+    }));
+  }
+  buildCharts();
+  window.addEventListener("dash-theme", buildCharts);
+</script>
+{% endblock %}

@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block member_nav %}
+<section class="member-hero">
+  <div class="container">
+    <div class="d-flex flex-wrap align-items-center gap-3" data-reveal="up">
+      {% if user.profile.photo %}
+        <img src="{{ user.profile.photo.url }}" alt="" class="rounded-circle" width="64" height="64" style="object-fit:cover;border:3px solid var(--li-primary)">
+      {% else %}
+        <span class="avatar-placeholder rounded-circle" style="width:64px;height:64px;font-size:1.8rem">{{ user.first_name|default:user.username|slice:":1"|upper }}</span>
+      {% endif %}
+      <div>
+        <div class="small text-muted">Member ID {{ user.profile.member_id }}</div>
+        <h1 class="display-font text-white mb-0" style="font-size:2.6rem">{% block member_heading %}Hey, {{ user.first_name|default:user.username }}{% endblock %}</h1>
+      </div>
+      <div class="ms-auto d-flex gap-2">{% block member_actions %}<a href="{% url 'members:classes' %}" class="btn btn-li"><i class="bi bi-calendar-plus me-1"></i> Book a Class</a>{% endblock %}</div>
+    </div>
+  </div>
+</section>
+{% include 'members/_nav.html' %}
+{% endblock %}
+{% block content %}
+<div class="container py-4 py-lg-5">
+  {% block member_content %}{% endblock %}
+</div>
+{% endblock %}

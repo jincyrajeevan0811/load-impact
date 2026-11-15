@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% block footer %}{% endblock %}
+{% block content %}
+{% with v=S_all.login %}
+<section class="auth-split">
+  <div class="auth-visual" style="--img: url('{{ v.img|default:IMG.auth }}')">
+    <div data-reveal="up">
+      <span class="hero-badge mb-3"><span class="dot"><i class="bi {{ SITE.brand_icon|default:'bi-lightning-charge-fill' }}"></i></span> {{ v.eyebrow|default:"LoadImpact Members" }}</span>
+      <h2 class="mt-3">{% block visual_title %}{{ v.title|default:"Every rep" }}<br><span class="text-gradient">{{ v.highlight|default:"counts." }}</span>{% endblock %}</h2>
+      <p class="text-white-50 mb-4" style="max-width:420px">{% block visual_text %}{{ v.subtitle|default:"Book classes, track your visits and manage your membership — all in one place." }}{% endblock %}</p>
+      <div class="d-flex gap-4">
+        <div><div class="display-font fs-2 text-white">24/7</div><div class="small text-white-50">Online booking</div></div>
+        <div><div class="display-font fs-2 text-white">100%</div><div class="small text-white-50">Unisex friendly</div></div>
+        <div><div class="display-font fs-2 text-white"><i class="bi bi-shield-check"></i></div><div class="small text-white-50">Secure account</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="auth-panel">
+    <div class="blob blob-1"></div>
+    <div class="auth-card {% block auth_card_class %}{% endblock %}">
+      <div class="mb-4">
+        <h3 class="display-font text-white mb-1" style="font-size:2.4rem">{% block auth_title %}{% endblock %}</h3>
+        <p class="text-muted small mb-0">{% block auth_subtitle %}{% endblock %}</p>
+      </div>
+      {% block auth_body %}{% endblock %}
+    </div>
+  </div>
+</section>
+{% endwith %}
+{% endblock %}

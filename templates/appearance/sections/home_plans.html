@@ -1,0 +1,12 @@
+{% if plans %}
+<section class="section">
+  <div class="big-bg-text">PRICING</div>
+  <div class="container position-relative">
+    <div class="text-center mb-5" data-reveal="up">{% include 'appearance/_heading.html' with center=True lead=True %}</div>
+    <div class="row g-4 justify-content-center align-items-center">
+      {% for plan in plans %}{% include 'gym/_plan_card.html' %}{% endfor %}
+    </div>
+    {% if s.button_text %}<div class="text-center mt-5" data-reveal="up"><a href="{{ s.button_url|default:'/plans/' }}" class="btn btn-glass">{{ s.button_text }} <i class="bi bi-arrow-right ms-1"></i></a></div>{% endif %}
+  </div>
+</section>
+{% endif %}

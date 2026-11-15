@@ -1,0 +1,11 @@
+<section class="section">
+  <div class="container">
+    <div class="row g-4 justify-content-center align-items-center">
+      {% for plan in plans %}
+        {% include 'gym/_plan_card.html' %}
+      {% empty %}
+        <p class="text-center text-muted">{{ s.subtitle }}</p>
+      {% endfor %}
+    </div>
+  </div>
+</section>

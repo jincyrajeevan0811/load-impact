@@ -1,0 +1,25 @@
+<div class="table-responsive">
+  <table class="table table-dash align-middle">
+    <thead><tr><th style="width:60px">Order</th><th>Label</th><th>Link</th><th>Status</th><th></th></tr></thead>
+    <tbody>
+    {% for link in links %}
+      <tr class="{% if not link.is_active %}opacity-50{% endif %}">
+        <td class="text-nowrap">
+          <form method="post" action="{% url 'dashboard:appearance_nav_action' link.pk 'up' %}" class="d-inline">{% csrf_token %}<button class="btn btn-sm btn-link p-0 text-muted" {% if forloop.first %}disabled{% endif %} title="Move up"><i class="bi bi-arrow-up"></i></button></form>
+          <form method="post" action="{% url 'dashboard:appearance_nav_action' link.pk 'down' %}" class="d-inline">{% csrf_token %}<button class="btn btn-sm btn-link p-0 text-muted" {% if forloop.last %}disabled{% endif %} title="Move down"><i class="bi bi-arrow-down"></i></button></form>
+        </td>
+        <td class="fw-semibold">{% if link.icon %}<i class="bi {{ link.icon }} me-1"></i>{% endif %}{{ link.label }}</td>
+        <td class="small"><a href="{{ link.url }}" target="_blank">{{ link.url }}</a>{% if link.open_in_new_tab %} <i class="bi bi-box-arrow-up-right text-muted"></i>{% endif %}</td>
+        <td>{% if link.is_active %}<span class="badge text-bg-success">Shown</span>{% else %}<span class="badge text-bg-secondary">Hidden</span>{% endif %}</td>
+        <td class="text-end text-nowrap">
+          <form method="post" action="{% url 'dashboard:appearance_nav_action' link.pk 'toggle' %}" class="d-inline">{% csrf_token %}<button class="btn btn-sm btn-light" title="Show / hide"><i class="bi {% if link.is_active %}bi-eye{% else %}bi-eye-slash{% endif %}"></i></button></form>
+          <a href="{% url 'dashboard:appearance_nav_edit' link.pk %}" class="btn btn-sm btn-light"><i class="bi bi-pencil"></i></a>
+          <form method="post" action="{% url 'dashboard:appearance_nav_action' link.pk 'delete' %}" class="d-inline" data-confirm="Remove the link &quot;{{ link.label }}&quot;?">{% csrf_token %}<button class="btn btn-sm btn-light text-danger"><i class="bi bi-trash"></i></button></form>
+        </td>
+      </tr>
+    {% empty %}
+      <tr><td colspan="5" class="text-muted">No links yet.</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>

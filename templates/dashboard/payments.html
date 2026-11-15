@@ -1,0 +1,69 @@
+{% extends 'dashboard/base.html' %}
+{% load dash_extras humanize %}
+{% block title %}Payments{% endblock %}
+{% block page_title %}Payments{% endblock %}
+{% block content %}
+<div class="row g-3 mb-3">
+  <div class="col-md-4"><div class="kpi"><div class="kpi-icon bg-success-subtle text-success"><i class="bi bi-check2-circle"></i></div><div><div class="kpi-value count-up">{{ GYM.currency }}{{ totals.paid|floatformat:0|intcomma }}</div><div class="kpi-label">Collected (filtered)</div></div></div></div>
+  <div class="col-md-4"><div class="kpi"><div class="kpi-icon bg-warning-subtle text-warning"><i class="bi bi-hourglass-split"></i></div><div><div class="kpi-value count-up">{{ GYM.currency }}{{ totals.pending|floatformat:0|intcomma }}</div><div class="kpi-label">Pending (filtered)</div></div></div></div>
+</div>
+<div class="panel">
+  <div class="d-flex flex-wrap justify-content-between gap-2 mb-3">
+    <form class="row g-2 flex-grow-1 filter-bar" method="get">
+      <div class="col-md-3"><input type="search" name="q" value="{{ q }}" class="form-control" placeholder="Member or reference"></div>
+      <div class="col-md-2">
+        <select name="status" class="form-select">
+          <option value="">Any status</option>
+          {% for v, l in status_choices %}<option value="{{ v }}" {% if status == v %}selected{% endif %}>{{ l }}</option>{% endfor %}
+        </select>
+      </div>
+      <div class="col-md-2">
+        <select name="method" class="form-select">
+          <option value="">Any method</option>
+          {% for v, l in method_choices %}<option value="{{ v }}" {% if method == v %}selected{% endif %}>{{ l }}</option>{% endfor %}
+        </select>
+      </div>
+      <div class="col-md-2"><input type="date" name="from" value="{{ date_from }}" class="form-control" title="From"></div>
+      <div class="col-md-2"><input type="date" name="to" value="{{ date_to }}" class="form-control" title="To"></div>
+      <div class="col-md-1"><button class="btn btn-dark w-100" title="Filter"><i class="bi bi-funnel"></i></button></div>
+    </form>
+  </div>
+  <div class="d-flex justify-content-end gap-2 mb-3">
+    <a href="?{% query_transform export='csv' page='' %}" class="btn btn-outline-secondary btn-sm"><i class="bi bi-download"></i> Export CSV</a>
+    <a href="{% url 'dashboard:payment_add' %}" class="btn btn-dash btn-sm"><i class="bi bi-plus-lg"></i> Record Payment</a>
+  </div>
+  <div class="table-responsive">
+    <table class="table table-dash table-hover">
+      <thead><tr><th>Invoice</th><th>Member</th><th>Plan</th><th>Amount</th><th>Method</th><th>Reference</th><th>Status</th><th>Date</th><th></th></tr></thead>
+      <tbody>
+      {% for p in page_obj %}
+        <tr>
+          <td class="fw-semibold">{{ p.invoice_no }}</td>
+          <td><a href="{% url 'dashboard:member_detail' p.user.pk %}">{{ p.user.get_full_name|default:p.user.username }}</a></td>
+          <td>{{ p.membership.plan.name|default:"—" }}</td>
+          <td>{{ GYM.currency }}{{ p.amount|floatformat:2|intcomma }}</td>
+          <td>{{ p.get_method_display }}</td>
+          <td class="small">{{ p.transaction_id|default:"—" }}</td>
+          <td>{% include 'includes/status_badge.html' with status=p.status label=p.get_status_display %}</td>
+          <td class="small text-muted">{{ p.created_at|date:"d M Y" }}</td>
+          <td class="text-end text-nowrap">
+            {% if p.status == 'pending' %}
+              <form method="post" action="{% url 'dashboard:payment_paid' p.pk %}" class="d-inline" data-confirm="Mark {{ p.invoice_no }} as paid?">{% csrf_token %}
+                <input type="hidden" name="next" value="{{ request.get_full_path }}">
+                <button class="btn btn-sm btn-success" title="Mark paid"><i class="bi bi-check2"></i></button>
+              </form>
+            {% endif %}
+            <a href="{% url 'members:invoice' p.pk %}" class="btn btn-sm btn-light" title="Invoice"><i class="bi bi-receipt"></i></a>
+            <a href="{% url 'dashboard:payment_edit' p.pk %}" class="btn btn-sm btn-light"><i class="bi bi-pencil"></i></a>
+            <a href="{% url 'dashboard:payment_delete' p.pk %}" class="btn btn-sm btn-light text-danger"><i class="bi bi-trash"></i></a>
+          </td>
+        </tr>
+      {% empty %}
+        <tr><td colspan="9" class="text-center text-muted py-4">No payments found.</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% include 'dashboard/_pagination.html' %}
+</div>
+{% endblock %}

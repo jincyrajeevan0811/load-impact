@@ -1,0 +1,20 @@
+<section class="section">
+  <div class="big-bg-text">{{ s.name|upper }}</div>
+  <div class="container position-relative">
+    <div class="row align-items-end mb-5 g-3">
+      <div class="col-lg-7" data-reveal="left">{% include 'appearance/_heading.html' %}</div>
+      <div class="col-lg-5" data-reveal="right">{% if s.subtitle %}<p class="text-muted mb-0">{{ s.subtitle }}</p>{% endif %}</div>
+    </div>
+    <div class="row g-4">
+      {% for item in s.item_list %}
+      <div class="col-md-6 col-lg-3" data-reveal="up" data-delay=".{{ forloop.counter0 }}">
+        <a href="{{ item.url|default:'#' }}" class="program-card" data-tilt>
+          <div class="img" style="--img: url('{{ item.img }}')"></div>
+          <span class="arrow"><i class="bi bi-arrow-right"></i></span>
+          <div class="body">{% if item.label %}<div class="num">{{ item.label }}</div>{% endif %}<h3>{{ item.title }}</h3>{% if item.text %}<p>{{ item.text }}</p>{% endif %}</div>
+        </a>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>

@@ -1,0 +1,62 @@
+{% extends 'dashboard/base.html' %}
+{% load dash_extras %}
+{% block title %}Members{% endblock %}
+{% block page_title %}{% if role == 'staff' %}Staff Users{% else %}Members{% endif %}{% endblock %}
+{% block content %}
+<div class="panel">
+  <div class="d-flex flex-wrap justify-content-between gap-2 mb-3">
+    <ul class="nav nav-pills">
+      <li class="nav-item"><a class="nav-link {% if role != 'staff' %}active bg-dark{% endif %}" href="?role=members">Members</a></li>
+      <li class="nav-item"><a class="nav-link {% if role == 'staff' %}active bg-dark{% endif %}" href="?role=staff">Staff</a></li>
+    </ul>
+    <div class="d-flex gap-2">
+      <a href="?{% query_transform export='csv' page='' %}" class="btn btn-outline-secondary btn-sm"><i class="bi bi-download"></i> Export CSV</a>
+      <a href="{% url 'dashboard:member_add' %}" class="btn btn-dash btn-sm"><i class="bi bi-person-plus"></i> Add Member</a>
+    </div>
+  </div>
+  <form class="row g-2 filter-bar mb-3" method="get">
+    <input type="hidden" name="role" value="{{ role }}">
+    <div class="col-md-5"><input type="search" name="q" value="{{ q }}" class="form-control" placeholder="Search name, username, email or phone"></div>
+    <div class="col-md-3">
+      <select name="status" class="form-select">
+        <option value="">All statuses</option>
+        <option value="active" {% if status == 'active' %}selected{% endif %}>Active membership</option>
+        <option value="inactive" {% if status == 'inactive' %}selected{% endif %}>No active membership</option>
+        <option value="disabled" {% if status == 'disabled' %}selected{% endif %}>Disabled accounts</option>
+      </select>
+    </div>
+    <div class="col-md-2"><button class="btn btn-dark w-100"><i class="bi bi-funnel"></i> Filter</button></div>
+    {% if q or status %}<div class="col-md-2"><a href="?role={{ role }}" class="btn btn-link w-100">Clear</a></div>{% endif %}
+  </form>
+  <div class="table-responsive">
+    <table class="table table-dash table-hover">
+      <thead><tr><th>Member</th><th>ID</th><th>Phone</th><th>Gender</th><th>Membership</th><th>Joined</th><th>Account</th><th></th></tr></thead>
+      <tbody>
+      {% for m in page_obj %}
+        <tr>
+          <td>
+            <a href="{% url 'dashboard:member_detail' m.pk %}" class="d-flex align-items-center gap-2 text-decoration-none text-reset">
+              {% if m.profile.photo %}<img src="{{ m.profile.photo.url }}" class="avatar-sm" alt="">{% else %}<span class="avatar-sm">{{ m.first_name|default:m.username|slice:":1"|upper }}</span>{% endif %}
+              <div><div class="fw-semibold">{{ m.get_full_name|default:m.username }}</div><small class="text-muted">{{ m.email }}</small></div>
+            </a>
+          </td>
+          <td class="small">{{ m.profile.member_id }}</td>
+          <td class="small">{{ m.profile.phone|default:"—" }}</td>
+          <td class="small">{{ m.profile.get_gender_display|default:"—" }}</td>
+          <td>{% if m.id in active_ids %}<span class="badge rounded-pill text-bg-success">Active</span>{% else %}<span class="badge rounded-pill text-bg-light border">None</span>{% endif %}</td>
+          <td class="small">{{ m.date_joined|date:"d M Y" }}</td>
+          <td>{% if m.is_active %}<span class="text-success small"><i class="bi bi-circle-fill" style="font-size:.5rem"></i> Enabled</span>{% else %}<span class="text-danger small"><i class="bi bi-circle-fill" style="font-size:.5rem"></i> Disabled</span>{% endif %}</td>
+          <td class="text-end text-nowrap">
+            <a href="{% url 'dashboard:member_detail' m.pk %}" class="btn btn-sm btn-light" title="View"><i class="bi bi-eye"></i></a>
+            <a href="{% url 'dashboard:member_edit' m.pk %}" class="btn btn-sm btn-light" title="Edit"><i class="bi bi-pencil"></i></a>
+          </td>
+        </tr>
+      {% empty %}
+        <tr><td colspan="8" class="text-center text-muted py-4">No members found.</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% include 'dashboard/_pagination.html' %}
+</div>
+{% endblock %}

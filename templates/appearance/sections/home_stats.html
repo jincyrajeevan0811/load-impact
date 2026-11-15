@@ -1,0 +1,11 @@
+{% if s.item_list %}
+<section class="py-5">
+  <div class="container">
+    <div class="row g-0 glass">
+      {% for item in s.item_list %}
+        <div class="col-6 col-md counter-box" data-reveal="up" data-delay=".{{ forloop.counter0 }}"><div class="num text-gradient count-up">{{ item.value }}</div><div class="lbl">{{ item.text }}</div></div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}

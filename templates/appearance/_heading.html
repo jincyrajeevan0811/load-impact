@@ -1,0 +1,4 @@
+{% comment %}Section heading. Params: s (section), center (bool), lead (bool: show subtitle){% endcomment %}
+{% if s.eyebrow %}<div class="section-subtitle {% if center %}justify-content-center{% endif %}">{{ s.eyebrow }}</div>{% endif %}
+{% if s.title or s.highlight %}<h2 class="section-title">{{ s.title }}{% if s.highlight %} <span class="text-gradient">{{ s.highlight }}</span>{% endif %}</h2>{% endif %}
+{% if lead and s.subtitle %}<p class="text-muted {% if center %}mx-auto{% endif %}" style="max-width:640px">{{ s.subtitle|linebreaksbr }}</p>{% endif %}

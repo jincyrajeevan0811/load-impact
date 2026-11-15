@@ -1,0 +1,14 @@
+{% with url_name=request.resolver_match.url_name %}
+<div class="member-nav">
+  <div class="container">
+    <ul class="nav flex-nowrap overflow-auto">
+      <li class="nav-item"><a class="nav-link text-nowrap {% if url_name == 'dashboard' %}active{% endif %}" href="{% url 'members:dashboard' %}"><i class="bi bi-grid me-1"></i>Dashboard</a></li>
+      <li class="nav-item"><a class="nav-link text-nowrap {% if url_name == 'classes' %}active{% endif %}" href="{% url 'members:classes' %}"><i class="bi bi-calendar-plus me-1"></i>Book Classes</a></li>
+      <li class="nav-item"><a class="nav-link text-nowrap {% if url_name == 'bookings' %}active{% endif %}" href="{% url 'members:bookings' %}"><i class="bi bi-calendar-check me-1"></i>My Bookings</a></li>
+      <li class="nav-item"><a class="nav-link text-nowrap {% if url_name == 'billing' or url_name == 'subscribe' %}active{% endif %}" href="{% url 'members:billing' %}"><i class="bi bi-credit-card me-1"></i>Membership &amp; Payments</a></li>
+      <li class="nav-item"><a class="nav-link text-nowrap {% if url_name == 'attendance' %}active{% endif %}" href="{% url 'members:attendance' %}"><i class="bi bi-clock-history me-1"></i>Attendance</a></li>
+      <li class="nav-item"><a class="nav-link text-nowrap {% if url_name == 'profile' or url_name == 'profile_edit' %}active{% endif %}" href="{% url 'accounts:profile' %}"><i class="bi bi-person me-1"></i>Profile</a></li>
+    </ul>
+  </div>
+</div>
+{% endwith %}

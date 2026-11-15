@@ -1,0 +1,77 @@
+{% extends 'dashboard/base.html' %}
+{% block title %}Appearance{% endblock %}
+{% block page_title %}Appearance{% endblock %}
+{% block content %}
+{% include 'dashboard/appearance/_tabs.html' %}
+
+<div class="row g-3 mb-3">
+  <div class="col-lg-5">
+    <div class="panel h-100">
+      <div class="panel-title">Brand <a href="{% url 'dashboard:appearance_branding' %}" class="small fw-normal">Edit</a></div>
+      <div class="rounded-4 p-4 d-flex align-items-center gap-3" style="background:{{ site.background_color }};color:{{ site.text_color }}">
+        {% if site.logo %}
+          <img src="{{ site.logo.url }}" alt="Logo" style="height:{{ site.logo_height }}px">
+        {% else %}
+          <span class="d-inline-flex align-items-center justify-content-center rounded-3" style="width:44px;height:44px;background:linear-gradient(135deg,{{ site.primary_color }},{{ site.secondary_color }});color:#fff"><i class="bi {{ site.brand_icon }}"></i></span>
+          <span class="display-font fs-2" style="color:#fff">{{ site.brand_text_1 }}<span style="color:{{ site.primary_color }}">{{ site.brand_text_2 }}</span></span>
+        {% endif %}
+      </div>
+      <div class="mt-3 small text-muted">{{ site.site_name }} · {{ site.tagline }}</div>
+    </div>
+  </div>
+  <div class="col-lg-7">
+    <div class="panel h-100">
+      <div class="panel-title">Colours &amp; fonts <a href="{% url 'dashboard:appearance_colors' %}" class="small fw-normal">Edit</a></div>
+      <div class="d-flex flex-wrap gap-3 mb-3">
+        <div class="text-center"><div class="rounded-3 border" style="width:56px;height:56px;background:{{ site.primary_color }}"></div><small class="text-muted">Primary</small></div>
+        <div class="text-center"><div class="rounded-3 border" style="width:56px;height:56px;background:{{ site.secondary_color }}"></div><small class="text-muted">Secondary</small></div>
+        <div class="text-center"><div class="rounded-3 border" style="width:56px;height:56px;background:{{ site.accent_color }}"></div><small class="text-muted">Accent</small></div>
+        <div class="text-center"><div class="rounded-3 border" style="width:56px;height:56px;background:{{ site.background_color }}"></div><small class="text-muted">Background</small></div>
+        <div class="text-center"><div class="rounded-3 border" style="width:56px;height:56px;background:{{ site.dash_primary_color }}"></div><small class="text-muted">Dashboard</small></div>
+        <div class="text-center"><div class="rounded-3 border" style="width:56px;height:56px;background:{{ site.dash_sidebar_color }}"></div><small class="text-muted">Sidebar</small></div>
+      </div>
+      <div class="small text-muted">Headings: <strong>{{ site.heading_font }}</strong> · Body: <strong>{{ site.body_font }}</strong> · Dashboard default: <strong>{{ site.get_dash_default_theme_display }}</strong> mode</div>
+    </div>
+  </div>
+</div>
+
+<div class="panel mb-3">
+  <div class="panel-title">Pages <a href="{% url 'dashboard:appearance_pages' %}" class="small fw-normal">Manage sections</a></div>
+  <div class="row g-3">
+    {% for p in pages %}
+    <div class="col-sm-6 col-xl-3">
+      <div class="kpi">
+        <div class="kpi-icon grad"><i class="bi bi-file-earmark-richtext"></i></div>
+        <div class="flex-grow-1">
+          <div class="fw-semibold">{{ p.label }}</div>
+          <div class="kpi-label">{{ p.count }} section{{ p.count|pluralize }}{% if p.hidden %} · {{ p.hidden }} hidden{% endif %}</div>
+          <div class="mt-2 d-flex gap-2">
+            <a href="{% url 'dashboard:appearance_pages' %}?page={{ p.key }}" class="btn btn-sm btn-dash py-0">Edit</a>
+            <a href="{{ p.path }}" target="_blank" class="btn btn-sm btn-light py-0">View <i class="bi bi-box-arrow-up-right"></i></a>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+
+<div class="row g-3">
+  <div class="col-md-6">
+    <div class="panel h-100">
+      <div class="panel-title">Navigation <a href="{% url 'dashboard:appearance_nav' %}" class="small fw-normal">Edit</a></div>
+      <div class="dl-row"><span>Header menu links</span><span>{{ header_links }}</span></div>
+      <div class="dl-row"><span>Footer links</span><span>{{ footer_links }}</span></div>
+      <div class="dl-row"><span>Header button</span><span>{{ site.nav_cta_text }}</span></div>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div class="panel h-100">
+      <div class="panel-title">Contact &amp; footer <a href="{% url 'dashboard:appearance_contact' %}" class="small fw-normal">Edit</a></div>
+      <div class="dl-row"><span>Phone</span><span>{{ site.phone }}</span></div>
+      <div class="dl-row"><span>Email</span><span>{{ site.email }}</span></div>
+      <div class="dl-row"><span>Hours</span><span>{{ site.hours_weekday }}</span></div>
+    </div>
+  </div>
+</div>
+{% endblock %}

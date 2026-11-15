@@ -1,0 +1,38 @@
+{% extends 'dashboard/base.html' %}
+{% block title %}Membership Plans{% endblock %}
+{% block page_title %}Membership Plans{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-end mb-3">
+  <a href="{% url 'dashboard:plan_add' %}" class="btn btn-dash"><i class="bi bi-plus-lg"></i> Add Plan</a>
+</div>
+<div class="row g-3">
+  {% for plan in plans %}
+  <div class="col-md-6 col-xl-4">
+    <div class="panel h-100 d-flex flex-column {% if not plan.is_active %}opacity-75{% endif %}">
+      <div class="d-flex justify-content-between align-items-start">
+        <div>
+          <h5 class="mb-0">{{ plan.name }}</h5>
+          <small class="text-muted">{{ plan.duration_label }} · {{ plan.duration_days }} days</small>
+        </div>
+        <div class="text-end">
+          {% if plan.is_popular %}<span class="badge text-bg-warning">Popular</span>{% endif %}
+          {% if plan.is_active %}<span class="badge text-bg-success">Active</span>{% else %}<span class="badge text-bg-secondary">Hidden</span>{% endif %}
+        </div>
+      </div>
+      <div class="fs-3 fw-bold my-2" style="font-family:Oswald">{{ GYM.currency }}{{ plan.price|floatformat:0 }}</div>
+      <p class="small text-muted">{{ plan.description }}</p>
+      <ul class="small ps-3 flex-grow-1">{% for f in plan.feature_list %}<li>{{ f }}</li>{% endfor %}</ul>
+      <div class="d-flex justify-content-between align-items-center border-top pt-2">
+        <small class="text-muted">{{ plan.active_count }} active · {{ plan.total_count }} total</small>
+        <div>
+          <a href="{% url 'dashboard:plan_edit' plan.pk %}" class="btn btn-sm btn-light"><i class="bi bi-pencil"></i></a>
+          <a href="{% url 'dashboard:plan_delete' plan.pk %}" class="btn btn-sm btn-light text-danger"><i class="bi bi-trash"></i></a>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% empty %}
+  <div class="col-12"><div class="panel text-center text-muted py-5">No plans yet. <a href="{% url 'dashboard:plan_add' %}">Create the first plan</a>.</div></div>
+  {% endfor %}
+</div>
+{% endblock %}

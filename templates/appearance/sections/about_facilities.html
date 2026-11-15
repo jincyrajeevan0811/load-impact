@@ -1,0 +1,13 @@
+<section class="section">
+  <div class="big-bg-text">{{ s.name|upper }}</div>
+  <div class="container position-relative">
+    <div class="text-center mb-5" data-reveal="up">{% include 'appearance/_heading.html' with center=True %}</div>
+    <div class="row g-4 text-center">
+      {% for item in s.item_list %}
+      <div class="col-6 col-md-3" data-reveal="zoom" data-delay=".{{ forloop.counter0 }}">
+        <div class="card-li p-4 h-100"><div class="feature-icon mb-3"><i class="bi {{ item.icon|default:'bi-star' }}"></i></div><h5 class="text-white mb-0">{{ item.title }}</h5></div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>

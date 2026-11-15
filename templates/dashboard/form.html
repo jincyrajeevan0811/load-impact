@@ -1,0 +1,15 @@
+{% extends 'dashboard/base.html' %}
+{% block title %}{{ page_title }}{% endblock %}
+{% block page_title %}{{ page_title }}{% endblock %}
+{% block content %}
+<div class="panel" style="max-width: 960px;">
+  <form method="post" enctype="multipart/form-data" novalidate>
+    {% csrf_token %}
+    {% include 'includes/form_fields.html' with cols='col-md-6' %}
+    <div class="d-flex gap-2 mt-4">
+      <button type="submit" class="btn btn-dash"><i class="bi bi-check2"></i> Save</button>
+      <a href="{{ back_url }}" class="btn btn-outline-secondary">Cancel</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

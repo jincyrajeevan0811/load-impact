@@ -1,0 +1,19 @@
+<section class="section {% if not forloop.first %}pt-0{% endif %}">
+  <div class="container">
+    <div class="cta text-center" style="--img: url('{{ s.img }}')" data-reveal="zoom">
+      {% if s.eyebrow %}<div class="section-subtitle text-white justify-content-center">{{ s.eyebrow }}</div>{% endif %}
+      <h2>{{ s.title }}</h2>
+      {% if s.subtitle %}<p class="lead mb-4 mx-auto" style="max-width:560px">{{ s.subtitle }}</p>{% endif %}
+      <div class="d-flex flex-wrap justify-content-center gap-3">
+        {% if s.button_text %}
+          {% if user.is_authenticated and 'register' in s.button_url %}
+            <a href="{% url 'members:dashboard' %}" class="btn btn-light btn-lg rounded-pill px-4 fw-semibold text-dark">My Dashboard <i class="bi bi-arrow-right ms-1"></i></a>
+          {% else %}
+            <a href="{{ s.button_url|default:'#' }}" class="btn btn-light btn-lg rounded-pill px-4 fw-semibold text-dark">{{ s.button_text }} <i class="bi bi-arrow-right ms-1"></i></a>
+          {% endif %}
+        {% endif %}
+        {% if s.button_2_text %}<a href="{{ s.button_2_url|default:'#' }}" class="btn btn-glass btn-lg">{{ s.button_2_text }}</a>{% endif %}
+      </div>
+    </div>
+  </div>
+</section>

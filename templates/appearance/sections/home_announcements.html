@@ -1,0 +1,21 @@
+{% if announcements %}
+<section class="section section-alt">
+  <div class="container">
+    <div class="text-center mb-5" data-reveal="up">{% include 'appearance/_heading.html' with center=True lead=True %}</div>
+    <div class="row g-4">
+      {% for a in announcements %}
+      <div class="col-md-4" data-reveal="up" data-delay=".{{ forloop.counter0 }}">
+        <div class="card-li h-100 p-4">
+          <div class="d-flex align-items-center gap-2 mb-3">
+            <span class="feature-icon" style="width:44px;height:44px;font-size:1.1rem"><i class="bi bi-megaphone"></i></span>
+            <small class="text-muted">{{ a.created_at|date:"d M Y" }}</small>
+          </div>
+          <h4 class="text-white">{{ a.title }}</h4>
+          <p class="text-muted mb-0">{{ a.content|truncatewords:30 }}</p>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}

@@ -1,0 +1,17 @@
+{% if s.item_list %}
+<section class="section section-alt">
+  <div class="container">
+    <div class="row g-4 justify-content-center">
+      {% for item in s.item_list %}
+      <div class="col-md-4" data-reveal="up" data-delay=".{{ forloop.counter0 }}">
+        <div class="card-li p-4 h-100 text-center" data-tilt>
+          <div class="feature-icon mb-3"><i class="bi {{ item.icon|default:'bi-star' }}"></i></div>
+          <h3 class="text-white">{{ item.title }}</h3>
+          <p class="text-muted mb-0">{{ item.text }}</p>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}

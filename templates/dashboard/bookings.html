@@ -1,0 +1,53 @@
+{% extends 'dashboard/base.html' %}
+{% block title %}Bookings{% endblock %}
+{% block page_title %}Class Bookings{% endblock %}
+{% block content %}
+<div class="panel">
+  <form class="row g-2 filter-bar mb-3" method="get">
+    <div class="col-md-3"><input type="date" name="date" value="{{ date }}" class="form-control" title="Date"></div>
+    <div class="col-md-3">
+      <select name="class" class="form-select">
+        <option value="">All classes</option>
+        {% for c in classes %}<option value="{{ c.pk }}" {% if class_id == c.pk|stringformat:'s' %}selected{% endif %}>{{ c }}</option>{% endfor %}
+      </select>
+    </div>
+    <div class="col-md-2">
+      <select name="status" class="form-select">
+        <option value="">Any status</option>
+        {% for v, l in status_choices %}<option value="{{ v }}" {% if status == v %}selected{% endif %}>{{ l }}</option>{% endfor %}
+      </select>
+    </div>
+    <div class="col-md-2 d-flex align-items-center">
+      <div class="form-check"><input class="form-check-input" type="checkbox" name="all" value="1" id="allChk" {% if show_all %}checked{% endif %}><label class="form-check-label small" for="allChk">Include past</label></div>
+    </div>
+    <div class="col-md-2"><button class="btn btn-dark w-100"><i class="bi bi-funnel"></i> Filter</button></div>
+  </form>
+  <div class="table-responsive">
+    <table class="table table-dash table-hover">
+      <thead><tr><th>Date</th><th>Class</th><th>Time</th><th>Member</th><th>Status</th><th class="text-end">Mark as</th></tr></thead>
+      <tbody>
+      {% for b in page_obj %}
+        <tr>
+          <td class="text-nowrap">{{ b.date|date:"D, d M Y" }}</td>
+          <td class="fw-semibold">{{ b.gym_class.name }}</td>
+          <td>{{ b.gym_class.start_time|time:"g:i A" }}</td>
+          <td><a href="{% url 'dashboard:member_detail' b.user.pk %}">{{ b.user.get_full_name|default:b.user.username }}</a></td>
+          <td>{% include 'includes/status_badge.html' with status=b.status label=b.get_status_display %}</td>
+          <td class="text-end text-nowrap">
+            {% for v, l in status_choices %}{% if v != b.status %}
+              <form method="post" action="{% url 'dashboard:booking_status' b.pk v %}" class="d-inline">{% csrf_token %}
+                <input type="hidden" name="next" value="{{ request.get_full_path }}">
+                <button class="btn btn-sm {% if v == 'attended' %}btn-success{% elif v == 'cancelled' %}btn-outline-danger{% else %}btn-light{% endif %}">{{ l }}</button>
+              </form>
+            {% endif %}{% endfor %}
+          </td>
+        </tr>
+      {% empty %}
+        <tr><td colspan="6" class="text-center text-muted py-4">No bookings found.</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% include 'dashboard/_pagination.html' %}
+</div>
+{% endblock %}

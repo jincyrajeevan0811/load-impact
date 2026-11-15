@@ -1,0 +1,23 @@
+<section class="section">
+  <div class="container">
+    <div class="row g-4">
+      <div class="{% if S.map %}col-lg-7{% else %}col-lg-8 mx-auto{% endif %}" data-reveal="left">
+        <div class="glass p-4 p-md-5 h-100">
+          {% include 'appearance/_heading.html' %}
+          <form method="post" novalidate class="mt-3">
+            {% csrf_token %}
+            {% include 'includes/form_fields.html' with cols='col-md-6' %}
+            <button type="submit" class="btn btn-li btn-lg mt-4"><i class="bi bi-send me-1"></i> {{ s.button_text|default:"Send Message" }}</button>
+          </form>
+        </div>
+      </div>
+      {% if S.map %}
+      <div class="col-lg-5" data-reveal="right">
+        <div class="glass overflow-hidden h-100" style="min-height:420px">
+          <iframe title="Map to {{ GYM.name }}" src="https://maps.google.com/maps?q={{ S.map.extra|default:GYM.address|urlencode }}&output=embed" width="100%" height="100%" style="border:0;min-height:420px;filter:invert(.9) hue-rotate(180deg) contrast(.9)" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+        </div>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</section>

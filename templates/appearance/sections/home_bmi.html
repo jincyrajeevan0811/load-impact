@@ -1,0 +1,30 @@
+<section class="section section-alt">
+  <div class="container">
+    <div class="row g-5 align-items-center">
+      <div class="col-lg-5" data-reveal="left">
+        {% include 'appearance/_heading.html' with lead=True %}
+        <form id="bmiForm" class="bmi-form row g-3 mt-2">
+          <div class="col-6"><input type="number" step="0.1" min="50" max="250" name="height" class="form-control" placeholder="Height (cm)" required aria-label="Height in cm"></div>
+          <div class="col-6"><input type="number" step="0.1" min="20" max="300" name="weight" class="form-control" placeholder="Weight (kg)" required aria-label="Weight in kg"></div>
+          <div class="col-12"><button class="btn btn-li w-100 btn-lg" type="submit"><i class="bi bi-calculator me-1"></i> {{ s.button_text|default:"Calculate" }}</button></div>
+        </form>
+      </div>
+      <div class="col-lg-7" data-reveal="right">
+        <div class="glass p-4 p-md-5 bmi-wrap">
+          <div class="d-flex justify-content-between align-items-end flex-wrap gap-3">
+            <div>
+              <div class="text-muted small text-uppercase" style="letter-spacing:2px">Your BMI</div>
+              <div class="bmi-result" id="bmiValue">--.-</div>
+            </div>
+            <div class="text-end">
+              <div class="fs-4 display-font text-white" id="bmiCategory">Enter your details</div>
+              <div class="small text-muted" id="bmiTip" style="max-width:300px">We'll suggest the right program for you.</div>
+            </div>
+          </div>
+          <div class="bmi-scale"><div class="bmi-pointer" id="bmiPointer"></div></div>
+          <div class="d-flex justify-content-between small text-muted"><span>Under &lt;18.5</span><span>Healthy 18.5–25</span><span>Over 25–30</span><span>Obese 30+</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
