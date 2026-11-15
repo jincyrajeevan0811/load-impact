@@ -118,3 +118,7 @@ In text, `{members}`, `{trainers}` and `{classes}` are replaced with live number
 Set the environment variables `DJANGO_SECRET_KEY`, `DJANGO_DEBUG=False` and `DJANGO_ALLOWED_HOSTS=yourdomain.com`,
 run `python manage.py collectstatic`, serve static and media files with your web server (e.g. Nginx),
 configure a real email backend for password resets, and consider PostgreSQL instead of SQLite.
+
+## Hosting
+
+See [DEPLOY.md](DEPLOY.md) for step-by-step free hosting on PythonAnywhere.

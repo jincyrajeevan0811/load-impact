@@ -14,7 +14,21 @@ SECRET_KEY = os.environ.get(
     "django-insecure-loadimpact-change-this-key-before-going-live-9f3k2m",
 )
 DEBUG = os.environ.get("DJANGO_DEBUG", "True") == "True"
-ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS", "127.0.0.1,localhost").split(",")
+ALLOWED_HOSTS = os.environ.get(
+    "DJANGO_ALLOWED_HOSTS", "127.0.0.1,localhost,.pythonanywhere.com"
+).split(",")
+CSRF_TRUSTED_ORIGINS = [
+    origin for origin in os.environ.get(
+        "DJANGO_CSRF_TRUSTED_ORIGINS", "https://*.pythonanywhere.com"
+    ).split(",") if origin
+]
+
+if not DEBUG:
+    # Production hardening (HTTPS is provided by the hosting platform)
+    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_CONTENT_TYPE_NOSNIFF = True
 
 INSTALLED_APPS = [
     "django.contrib.admin",
