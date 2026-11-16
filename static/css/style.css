@@ -40,7 +40,7 @@
   --bs-emphasis-color: #fff;
 }
 
-html { scroll-behavior: smooth; }
+html { scroll-behavior: smooth; overflow-x: hidden; overflow-x: clip; }
 body {
   font-family: var(--font-body);
   background: var(--li-bg);
@@ -486,3 +486,96 @@ input[type="date"]::-webkit-calendar-picker-indicator, input[type="time"]::-webk
 .no-anim .hero-ring, .no-anim .marquee-track, .no-anim .text-gradient, .no-anim .exp-badge, .no-anim .cta::after { animation: none !important; }
 .footer-brand .bolt { width: 40px; height: 40px; border-radius: 12px; background: var(--li-grad); display: inline-flex; align-items: center; justify-content: center; font-size: 1.1rem; }
 .footer-brand .accent { color: var(--li-primary); }
+
+/* =====================================================================
+   Mobile & tablet fixes
+   ===================================================================== */
+/* Nothing may make the page wider than the screen */
+main, .footer, section { overflow-x: clip; }
+img, iframe, video { max-width: 100%; }
+
+/* Admin "Edit this page" shortcut */
+.edit-page-btn { position: fixed; left: 20px; bottom: 24px; z-index: 1050; }
+
+/* Touch devices have no hover: show the hover-only content */
+@media (hover: none) {
+  .program-card p { max-height: none; opacity: 1; margin-top: .4rem; }
+  .program-card::before { background: linear-gradient(0deg, rgba(10, 11, 15, .95) 15%, rgba(10, 11, 15, .25) 75%); }
+  .trainer-social a { transform: none; }
+  .gallery-item::after { display: none; }
+}
+
+@media (max-width: 991.98px) {
+  .section { padding: 4.5rem 0; }
+  .hero { min-height: auto; padding: 7.5rem 0 4rem; }
+  .page-header { padding: 8.5rem 0 3.5rem; }
+  .about-collage { height: 440px; }
+  .big-bg-text { display: none; }
+  .member-hero { padding-top: 7rem; }
+}
+
+@media (max-width: 767.98px) {
+  /* Sideways reveal animations push content off-screen on phones: slide up instead */
+  [data-reveal="left"], [data-reveal="right"] { transform: translateY(40px); }
+
+  .navbar-li { padding: .8rem 0; }
+  .navbar-li .navbar-brand { font-size: 1.6rem; }
+  .navbar-li .navbar-brand .bolt { width: 34px; height: 34px; font-size: .95rem; }
+  .brand-logo { height: min(var(--logo-h, 42px), 36px); }
+
+  .section { padding: 3.5rem 0; }
+  .section-title { font-size: 2.3rem; }
+  .hero { padding: 6.5rem 0 3rem; }
+  .hero h1 { font-size: 3.1rem; margin: 1rem 0; }
+  .hero p.lead { font-size: 1rem; }
+  .hero .btn-lg { padding: .8rem 1.5rem; font-size: 1rem; }
+  .hero-stats { gap: 1.5rem; margin-top: 2rem; }
+  .hero-stats .num { font-size: 2rem; }
+  .hero-badge { font-size: .78rem; }
+
+  .marquee { transform: rotate(-2deg); margin: -1rem 0 .5rem; padding: .8rem 0; }
+  .marquee span { font-size: 1.4rem; padding: 0 1rem; gap: 1rem; }
+
+  .program-card { height: 340px; }
+  .program-card h3 { font-size: 1.9rem; }
+  .about-collage { height: 360px; }
+  .about-collage .exp-badge { padding: .9rem 1.1rem; }
+  .about-collage .exp-badge .num { font-size: 2.4rem; }
+  .counter-box { padding: 1.4rem .5rem; }
+  .pricing-card { padding: 1.6rem; }
+  .pricing-card .price { font-size: 3rem; }
+  .bmi-result { font-size: 3.4rem; }
+  .bmi-wrap .text-end { text-align: left !important; }
+  .trainer-photo { height: 260px; }
+  .cta { border-radius: 22px; padding: 2.5rem 1.4rem; }
+  .cta .btn-lg { width: 100%; }
+  .page-header { padding: 7.5rem 0 3rem; }
+  .page-header h1 { font-size: 2.8rem; }
+  .day-tabs .nav-link { min-width: 76px; padding: .6rem .8rem; }
+  .footer { padding: 3.5rem 0 1.5rem; }
+  .footer-big { font-size: 3.6rem; margin-top: 2rem; }
+
+  .auth-panel { padding: 6rem 1rem 2rem; }
+  .auth-card { padding: 1.6rem; border-radius: 22px; }
+  .member-hero { padding: 6.5rem 0 1.5rem; }
+  .member-hero h1 { font-size: 2rem !important; }
+  .member-hero .ms-auto { margin-left: 0 !important; width: 100%; }
+  .member-hero .ms-auto .btn { width: 100%; }
+  .membership-hero { padding: 1.5rem; border-radius: 22px; }
+  .membership-hero h2 { font-size: 2.2rem !important; }
+  .ring { --size: 140px; margin: 0 auto; }
+  .stat-card { padding: 1.1rem; }
+  .stat-card .value { font-size: 1.9rem; }
+
+  .messages-container { left: 12px; right: 12px; top: 76px; max-width: none; }
+  .edit-page-btn { left: 16px; bottom: 16px; width: 48px; height: 48px; padding: 0; border-radius: 50%;
+    display: inline-flex; align-items: center; justify-content: center; font-size: 1.1rem; }
+  .edit-page-btn .label { display: none; }
+  .back-to-top { right: 16px; bottom: 16px; width: 48px; height: 48px; }
+}
+
+@media (max-width: 380px) {
+  .hero h1 { font-size: 2.7rem; }
+  .hero-stats { gap: 1rem; }
+  .hero-stats .num { font-size: 1.7rem; }
+}

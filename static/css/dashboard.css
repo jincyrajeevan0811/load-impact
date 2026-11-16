@@ -181,3 +181,20 @@ body.dash { font-family: var(--font-body); background: var(--dash-bg); color: va
 .pw-toggle { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: 0; color: var(--dash-muted); }
 
 .brand-logo { height: var(--logo-h, 38px); width: auto; display: block; }
+
+/* ---------- Mobile ---------- */
+html, body.dash { overflow-x: hidden; overflow-x: clip; }
+@media (max-width: 767.98px) {
+  .dash-content { padding: 1rem; }
+  .dash-topbar { padding: .6rem 1rem; }
+  .dash-topbar h1 { font-size: 1.35rem; max-width: 46vw; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .welcome-banner { padding: 1.3rem; }
+  .welcome-banner h2 { font-size: 1.8rem; }
+  .welcome-banner .banner-bolt { display: none; }
+  .kpi { padding: 1rem; }
+  .kpi .kpi-value { font-size: 1.7rem; }
+  .panel { padding: 1rem; border-radius: 14px; }
+  .messages-container { left: 12px; right: 12px; max-width: none; }
+  .filter-bar .form-control, .filter-bar .form-select { min-width: 0; }
+  .table-dash td, .table-dash th { white-space: nowrap; }
+}
