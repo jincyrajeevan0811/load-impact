@@ -176,3 +176,15 @@ GYM_IMAGES = {
         _UNSPLASH.format("photo-1583454110551-21f2fa2afe61", 800),
     ],
 }
+
+# Print errors (including the full traceback of any "Server Error (500)") to the
+# console, so they appear in Render's / PythonAnywhere's logs.
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {"console": {"class": "logging.StreamHandler"}},
+    "root": {"handlers": ["console"], "level": "WARNING"},
+    "loggers": {
+        "django": {"handlers": ["console"], "level": os.environ.get("DJANGO_LOG_LEVEL", "INFO"), "propagate": False},
+    },
+}
